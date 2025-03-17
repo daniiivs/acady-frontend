@@ -7,6 +7,8 @@ import {InputText} from 'primeng/inputtext';
 import {FormsModule} from '@angular/forms';
 import {InputIcon} from 'primeng/inputicon';
 import {IconField} from 'primeng/iconfield';
+import {RouterLink} from '@angular/router';
+import {Password, PasswordDirective} from 'primeng/password';
 
 @Component({
   selector: 'login',
@@ -17,7 +19,10 @@ import {IconField} from 'primeng/iconfield';
     InputText,
     FormsModule,
     InputIcon,
-    IconField
+    IconField,
+    RouterLink,
+    PasswordDirective,
+    Password
   ],
   templateUrl: './login.component.html'
 })

@@ -9,3 +9,19 @@ body, html {
   margin: 0;
   padding: 0;
 }
+
+a {
+  color: inherit;
+}
+
+.p-password .p-password-input {
+  padding: 1rem;
+}
+
+.p-password .p-password-mask-icon	{
+  margin-right: 0.5rem;
+}
+
+.p-password .p-password-unmask-icon	{
+  margin-right: 0.5rem;
+}
