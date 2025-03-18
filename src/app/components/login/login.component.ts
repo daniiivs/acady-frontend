@@ -21,7 +21,6 @@ import {Password, PasswordDirective} from 'primeng/password';
     InputIcon,
     IconField,
     RouterLink,
-    PasswordDirective,
     Password
   ],
   templateUrl: './login.component.html'

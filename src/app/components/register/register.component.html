@@ -1,83 +1,167 @@
 <div class="flex justify-content-center align-items-center surface-50" style="height: 100vh;">
   <p-card class="mb-5 px-8" [style]="{ width: '45rem' }">
     <div class="px-5">
-      <p-stepper [value]="1" [linear]="true">
-        <p-step-list>
-          <p-step [value]="1"></p-step>
-          <p-step [value]="2"></p-step>
-          <p-step [value]="3"></p-step>
-        </p-step-list>
-        <p-step-panels>
-          <p-step-panel [value]="1">
-            <ng-template #content let-activateCallback="activateCallback">
-              <div class="block px-6">
-                <h1 class="m-0">¡Genial!</h1>
-                <p class="mb-5">Comencemos por tu email y nombre de usuario:</p>
-                <p-floatlabel variant="on" class="mb-3">
-                  <p-iconfield>
-                    <input pInputText id="on_label" autocomplete="off" fluid variant="filled" class="p-3"/>
-                    <p-inputicon class="pi pi-envelope pr-2"/>
-                  </p-iconfield>
-                  <label for="on_label">Email</label>
-                </p-floatlabel>
-                <p-floatlabel variant="on" class="mt-3 mb-5">
-                  <p-iconfield>
-                    <input pInputText id="2" autocomplete="off" fluid variant="filled" class="p-3"/>
-                    <p-inputicon class="pi pi-user pr-2"/>
-                  </p-iconfield>
-                  <label for="on_label">Usuario</label>
-                </p-floatlabel>
-              </div>
-              <div class="flex px-6 justify-content-between flex-wrap">
-                <p-button label="Volver" severity="secondary" icon="pi pi-arrow-left" routerLink="/login"/>
-                <p-button label="Siguiente" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(2)"/>
-              </div>
-            </ng-template>
-          </p-step-panel>
+      <form (ngSubmit)="onSubmit(registerForm)" #registerForm="ngForm">
+        <p-stepper [(value)]="currentStep" [linear]="true">
+          <p-step-list>
+            <p-step [value]="1"></p-step>
+            <p-step [value]="2"></p-step>
+            <p-step [value]="3"></p-step>
+          </p-step-list>
+          <p-step-panels>
+            <p-step-panel [value]="1">
+              <ng-template #content>
+                <div class="block px-6">
+                  <h1 class="m-0">¡Genial!</h1>
+                  <p class="mb-5">Comencemos por tu correo y nombre de usuario:</p>
 
-          <p-step-panel [value]="2">
-            <ng-template #content let-activateCallback="activateCallback">
-              <div class="block px-6">
-                <h1 class="m-0">Ya queda menos...</h1>
-                <p class="mb-5">Ahora dinos tu nombre:</p>
-                <p-floatlabel variant="on" class="mb-3">
-                    <input pInputText id="cac" autocomplete="off" fluid variant="filled" class="p-3"/>
-                  <label for="cac">Nombre</label>
-                </p-floatlabel>
-                <p-floatlabel variant="on" class="mt-3 mb-5">
-                    <input pInputText id="ddd" autocomplete="off" fluid variant="filled" class="p-3"/>
-                  <label for="ddd">Apellido</label>
-                </p-floatlabel>
-              </div>
-              <div class="flex px-6 justify-content-between flex-wrap">
-                <p-button label="Atrás" severity="secondary" icon="pi pi-arrow-left" (onClick)="activateCallback(1)"/>
-                <p-button label="Siguiente" icon="pi pi-arrow-right" iconPos="right" (onClick)="activateCallback(3)"/>
-              </div>
-            </ng-template>
-          </p-step-panel>
+                  @if (emailAlreadyUsed) {
+                    <div class="flex justify-content-end pr-3 pb-2">
+                      <small class="text-red-600">
+                        * ¡El correo ya está en uso!
+                      </small>
+                    </div>
+                  }
 
-          <p-step-panel [value]="3">
-            <ng-template #content let-activateCallback="activateCallback">
-              <div class="block px-6">
-                <h1 class="m-0">¡Ya casi estás!</h1>
-                <p class="mb-5">Para finalizar, establece una contraseña:</p>
-                <p-floatlabel variant="on" class="mb-3">
-                  <p-password fluid id="password" [feedback]="false" [toggleMask]="true" variant="filled"></p-password>
-                  <label for="password">Contraseña</label>
-                </p-floatlabel>
-                <p-floatlabel variant="on" class="mt-3 mb-5">
-                  <p-password fluid id="repeat_password" [feedback]="false" [toggleMask]="true" variant="filled"></p-password>
-                  <label for="repeat_password">Repetir contraseña</label>
-                </p-floatlabel>
-              </div>
-              <div class="flex px-6 justify-content-between flex-wrap">
-                <p-button label="Atrás" severity="secondary" icon="pi pi-arrow-left" (onClick)="activateCallback(2)"/>
-                <p-button label="Registrarse" icon="pi pi-check" iconPos="right"/>
-              </div>
-            </ng-template>
-          </p-step-panel>
-        </p-step-panels>
-      </p-stepper>
+                  <p-floatlabel variant="on" class="mb-3">
+                    <p-iconfield>
+                      <input pInputText
+                             [(ngModel)]="registeredStudent.email"
+                             (ngModelChange)="resetEmailError()"
+                             required
+                             name="email"
+                             id="email"
+                             #email="ngModel"
+                             autocomplete="off"
+                             fluid
+                             variant="filled"
+                             class="p-3"/>
+                      <p-inputicon class="pi pi-envelope pr-2"/>
+                    </p-iconfield>
+                    <label for="email">Correo electrónico</label>
+                  </p-floatlabel>
+
+                  @if (usernameAlreadyUsed) {
+                    <div class="flex justify-content-end pr-3 pb-2">
+                      <small class="text-red-600">
+                        * ¡El usuario ya está en uso!
+                      </small>
+                    </div>
+                  }
+
+                  <p-floatlabel variant="on" class="mb-5">
+                    <p-iconfield>
+                      <input pInputText
+                             [(ngModel)]="registeredStudent.username"
+                             (ngModelChange)="resetUsernameError()"
+                             required
+                             name="username"
+                             id="username"
+                             #username="ngModel"
+                             autocomplete="off"
+                             fluid variant="filled"
+                             class="p-3"/>
+                      <p-inputicon class="pi pi-user pr-2"/>
+                    </p-iconfield>
+                    <label for="username">Usuario</label>
+                  </p-floatlabel>
+                </div>
+                <div class="flex px-6 justify-content-between flex-wrap">
+                  <p-button label="Volver" severity="secondary" icon="pi pi-arrow-left" routerLink="/login"/>
+                  <p-button label="Siguiente" [disabled]="isInvalid([registeredStudent.username, registeredStudent.email], [username, email])" icon="pi pi-arrow-right" iconPos="right" (onClick)="goToStep(2)"/>
+                </div>
+              </ng-template>
+            </p-step-panel>
+
+            <p-step-panel [value]="2">
+              <ng-template #content>
+                <div class="block px-6">
+                  <h1 class="m-0">Ya queda menos...</h1>
+                  <p class="mb-5">Ahora dinos cómo te llamas:</p>
+                  <p-floatlabel variant="on" class="mb-3">
+                    <input pInputText
+                           [(ngModel)]="registeredStudent.name"
+                           required
+                           name="name"
+                           id="name"
+                           #name="ngModel"
+                           autocomplete="off"
+                           fluid
+                           variant="filled"
+                           class="p-3"/>
+                    <label for="name">Nombre</label>
+                  </p-floatlabel>
+                  <p-floatlabel variant="on" class="mt-3 mb-5">
+                    <input pInputText
+                           [(ngModel)]="registeredStudent.lastname"
+                           required
+                           name="lastname"
+                           id="lastname"
+                           #lastname="ngModel"
+                           autocomplete="off"
+                           fluid
+                           variant="filled"
+                           class="p-3"/>
+                    <label for="lastname">Apellidos</label>
+                  </p-floatlabel>
+                </div>
+                <div class="flex px-6 justify-content-between flex-wrap">
+                  <p-button label="Atrás" severity="secondary" icon="pi pi-arrow-left" (onClick)="goToStep(1)"/>
+                  <p-button label="Siguiente" [disabled]="isInvalid([registeredStudent.name, registeredStudent.lastname], [name, lastname])" icon="pi pi-arrow-right" iconPos="right" (onClick)="goToStep(3)"/>
+                </div>
+              </ng-template>
+            </p-step-panel>
+
+            <p-step-panel [value]="3">
+              <ng-template #content>
+                <div class="block px-6">
+                  <h1 class="m-0">¡Ya casi estás!</h1>
+                  <p class="mb-5">Para finalizar, establece una contraseña:</p>
+                  <p-floatlabel variant="on" class="mb-3">
+                    <p-password fluid
+                                [(ngModel)]="registeredStudent.password"
+                                required
+                                name="lastname"
+                                id="password"
+                                [feedback]="false"
+                                [toggleMask]="true"
+                                variant="filled"/>
+                    <label for="password">Contraseña</label>
+                  </p-floatlabel>
+                  <p-floatlabel variant="on" class="mt-3 mb-5">
+                    <p-password fluid
+                                [(ngModel)]="repeatPassoword"
+                                required
+                                id="repeatPassoword"
+                                name="repeatPassoword"
+                                [feedback]="false"
+                                [toggleMask]="true"
+                                variant="filled"/>
+                    <label for="repeatPassoword">Repetir contraseña</label>
+                  </p-floatlabel>
+                </div>
+                <div class="flex px-6 justify-content-between flex-wrap">
+                  <p-button label="Atrás" severity="secondary" icon="pi pi-arrow-left" (onClick)="goToStep(2)"/>
+                  <p-button label="Registrarse" [disabled]="passwordsMatch()" icon="pi pi-check" iconPos="right" type="submit"/>
+                </div>
+              </ng-template>
+            </p-step-panel>
+          </p-step-panels>
+        </p-stepper>
+      </form>
     </div>
   </p-card>
+
+  <p-dialog header="Registro completado" closable="false" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+    <div
+      class="flex flex-column justify-content-center align-items-center"
+    >
+      <i class="pi pi-check-circle pt-4 pb-1" style="font-size: 5rem"></i>
+      <p>¡Ya puedes iniciar sesión!</p>
+    </div>
+    <div class="flex justify-content-end flex-wrap pt-4">
+      <p-button label="Ir al inicio" (click)="navigateToLogin()" />
+    </div>
+  </p-dialog>
 </div>
+
