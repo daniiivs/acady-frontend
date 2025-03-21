@@ -54,6 +54,7 @@ export class RegisterComponent {
 
   onSubmit(registerForm: NgForm): void {
     if (!registerForm.invalid) {
+      this.registeredStudent.email = this.registeredStudent.email.toLowerCase();
       this.authService.registerStudent(this.registeredStudent).pipe(take(1)).subscribe({
         next: () => {
           this.showDialog();
