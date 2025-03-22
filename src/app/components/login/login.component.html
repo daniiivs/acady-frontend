@@ -9,10 +9,21 @@
       </div>
       <div class="block px-8 py-4">
         <form (ngSubmit)="onSubmit(loginForm)" #loginForm="ngForm">
+
+          @if (isInvalid) {
+            <div class="flex justify-content-end pr-3 pb-2">
+              <small class="text-red-600">
+                {{ this.errorMessage }}
+              </small>
+            </div>
+          }
+
           <p-floatlabel variant="on" class="mb-4">
             <p-iconfield>
               <input pInputText
                      [(ngModel)]="username"
+                     (ngModelChange)="resetInvalidCredentials()"
+                     required
                      id="user"
                      name="user"
                      #user="ngModel"
@@ -27,6 +38,8 @@
           <p-floatlabel variant="on" class="mt-4 mb-5">
             <p-password fluid
                         [(ngModel)]="password"
+                        (ngModelChange)="resetInvalidCredentials()"
+                        required
                         id="pass"
                         name="pass"
                         #pass="ngModel"

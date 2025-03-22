@@ -19,14 +19,20 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<any> {
-    const credentials = {username, password};
-    return this.http.post(`${this.url}/login`, credentials, { withCredentials: true }).pipe(
-      catchError(this.handleLoginError)
-    );
+    const body = new URLSearchParams();
+    body.set('username', username);
+    body.set('password', password)
+
+    return this.http.post(`${this.url}/login`,
+      body.toString(),
+      {
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        withCredentials: true
+      });
   }
 
   logout(): Observable<any> {
-    return this.http.post(`${this.url}/logout`, {}, { withCredentials: true });
+    return this.http.post(`${this.url}/logout`, {}, {withCredentials: true});
   }
 
   private handleRegisterError(error: HttpErrorResponse) {
@@ -34,13 +40,5 @@ export class AuthService {
       return throwError(() => new Error(error.error.error));
     }
     return throwError(() => new Error('Ocurrió un error inesperado.'));
-  }
-
-  private handleLoginError(error: HttpErrorResponse) {
-    if (error.status === 401) {
-      return throwError(() => new Error('¡Las credenciales son inválidas!'));
-    } else {
-      return throwError(() => new Error(error.error.error));
-    }
   }
 }

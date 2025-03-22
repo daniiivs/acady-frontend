@@ -29,8 +29,11 @@ import {take} from 'rxjs';
   templateUrl: './login.component.html'
 })
 export class LoginComponent {
-  username! : string;
-  password! : string;
+  username: string = '';
+  password: string = '';
+
+  isInvalid: boolean = false;
+  errorMessage!: string;
 
   constructor(
     private authService: AuthService,
@@ -38,15 +41,28 @@ export class LoginComponent {
   }
 
   onSubmit(loginForm: NgForm): void {
+    if (this.username == '' || this.password == '') {
+      this.errorMessage = '* ¡Rellena todos los campos!'
+      this.isInvalid = true;
+      return;
+    }
+
     if (!loginForm.invalid) {
       this.authService.login(this.username, this.password).pipe(take(1)).subscribe({
         next: () => {
           console.log('login success');
         },
         error: err => {
-          console.log(err.message);
+          if (err.status === 401) {
+            this.errorMessage = '* ¡Las credenciales son incorrectas!'
+            this.isInvalid = true;
+          }
         }
       });
     }
+  }
+
+  resetInvalidCredentials = (): void => {
+    this.isInvalid = false;
   }
 }
