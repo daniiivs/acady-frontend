@@ -32,7 +32,8 @@ export class AuthService {
   }
 
   logout(): Observable<any> {
-    return this.http.post(`${this.url}/logout`, {}, {withCredentials: true});
+    localStorage.clear();
+    return this.http.post(`${this.url}/logout`, null, {withCredentials: true});
   }
 
   private handleRegisterError(error: HttpErrorResponse) {

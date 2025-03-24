@@ -13,6 +13,6 @@ export class StudentService {
   }
 
   getCurrentStudent(): Observable<Student> {
-    return this.http.get<Student>(`${this.url}/current`);
+    return this.http.get<Student>(`${this.url}/current`, { withCredentials: true });
   }
 }

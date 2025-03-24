@@ -1,0 +1,22 @@
+<p-menubar [model]="barItems">
+  <ng-template #item let-item>
+    @if (item.route) {
+      <p-button [label]="item.label" [icon]="item.icon" variant="text" (onClick)="handleClickButton(item.route)"/>
+    } @else {
+      <p-button [label]="item.label" [icon]="item.icon" variant="text"/>
+    }
+  </ng-template>
+  <ng-template #end>
+    <p-button [label]="currentStudent?.username || ''" icon="pi pi-user" variant="text" (onClick)="menu.toggle($event)" iconPos="right"/>
+  </ng-template>
+</p-menubar>
+
+<p-menu #menu [model]="menuItems" [popup]="true">
+  <ng-template #item let-item>
+    @if (item.label === 'Salir') {
+      <p-button [label]="item.label" [icon]="item.icon" variant="text" severity="danger" fluid (onClick)="handleLogout()"/>
+    } @else {
+      <p-button [label]="item.label" [icon]="item.icon" variant="text" fluid/>
+    }
+  </ng-template>
+</p-menu>
