@@ -12,6 +12,8 @@ import {AuthService} from '../../services/auth.service';
 import {take} from 'rxjs';
 import {updatePreset} from '@primeng/themes';
 import {colorPalette} from '../../app.config';
+import {StudentService} from '../../services/student.service';
+import {Student} from '../../models/student';
 
 @Component({
   selector: 'login',
@@ -37,6 +39,7 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private studentService: StudentService,
     private router: Router) {
   }
 
@@ -58,7 +61,10 @@ export class LoginComponent implements OnInit {
     if (!loginForm.invalid) {
       this.authService.login(this.username, this.password).pipe(take(1)).subscribe({
         next: () => {
-          void this.router.navigateByUrl('/home');
+          this.studentService.getCurrentStudent().pipe(take(1)).subscribe((student: Student) => {
+            localStorage.setItem('currentUser', JSON.stringify(student));
+            void this.router.navigateByUrl('/home');
+          });
         },
         error: err => {
           if (err.status === 401) {

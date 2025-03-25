@@ -6,8 +6,10 @@ import {Menu} from 'primeng/menu';
 import {AuthService} from '../../services/auth.service';
 import {Router} from '@angular/router';
 import {take} from 'rxjs';
-import {StudentService} from '../../services/student.service';
 import {Student} from '../../models/student';
+import {Subject} from '../../models/subject';
+import {SubjectService} from '../../services/subject.service';
+import {colorPalette} from '../../app.config';
 
 @Component({
   selector: 'navbar',
@@ -18,63 +20,27 @@ import {Student} from '../../models/student';
   ],
   templateUrl: './navbar.component.html'
 })
+
 export class NavbarComponent implements OnInit {
   barItems: MenuItem[] = [];
   menuItems: MenuItem[] = [];
 
   currentStudent!: Student;
+  currentSubjects!: Subject[];
+  subjectsMenu: any[] = [];
 
   constructor(
     private authService: AuthService,
-    private studentService: StudentService,
+    private subjectService: SubjectService,
     private router: Router) {
   }
 
   ngOnInit(): void {
-    if (!localStorage.getItem('currentUser')) {
-      this.studentService.getCurrentStudent().subscribe((student: Student) => {
-        localStorage.setItem('currentUser', JSON.stringify(student));
-        this.currentStudent = {...student};
-      })
-    } else {
-      this.currentStudent = JSON.parse(localStorage.getItem('currentUser')!);
-    }
-
-    this.barItems = [
-      {
-        label: 'Inicio',
-        icon: 'pi pi-home',
-        route: '/home',
-      },
-      {
-        label: 'Asignaturas',
-        icon: 'pi pi-book',
-        items: [
-          {
-            label: 'Components',
-            route: '/login',
-          },
-          {
-            label: 'Blocks',
-            route: '/login'
-          },
-          {
-            label: 'UI Kit',
-            route: '/login'
-          }
-        ]
-      },
-      {
-        label: 'Exámenes',
-        icon: 'pi pi-pencil',
-        route: '/login',
-      },
-      {
-        label: 'Tareas',
-        icon: 'pi pi-list',
-        route: '/login',
-      }
-    ];
+    this.currentStudent = JSON.parse(localStorage.getItem('currentUser')!);
+    this.subjectService.getSubjects(this.currentStudent.id!).subscribe((subjects: Subject[]) => {
+      this.currentSubjects = subjects;
+      this.setMenuBar();
+    });
 
     this.menuItems = [
       {
@@ -90,6 +56,38 @@ export class NavbarComponent implements OnInit {
     ]
   }
 
+  setMenuBar(): void {
+    for (const subject of this.currentSubjects) {
+      this.subjectsMenu.push({
+        label: subject.name,
+        color: subject.color
+      });
+    }
+
+    this.barItems = [
+      {
+        label: 'Inicio',
+        icon: 'pi pi-home',
+        route: '/home',
+      },
+      {
+        label: 'Asignaturas',
+        icon: 'pi pi-book',
+        items: this.subjectsMenu
+      },
+      {
+        label: 'Exámenes',
+        icon: 'pi pi-pencil',
+        route: '/login',
+      },
+      {
+        label: 'Tareas',
+        icon: 'pi pi-list',
+        route: '/login',
+      }
+    ];
+  }
+
   handleClickButton(route: string): void {
     void this.router.navigateByUrl(route);
   }
@@ -101,4 +99,6 @@ export class NavbarComponent implements OnInit {
       }
     });
   }
+
+  protected readonly colorPalette = colorPalette;
 }

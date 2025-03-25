@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Carousel} from 'primeng/carousel';
 import {NgStyle} from '@angular/common';
 import {colorPalette} from '../../app.config';
 import {Ripple} from 'primeng/ripple';
+import {Subject} from '../../models/subject';
 
 @Component({
   selector: 'subject-carousel',
@@ -14,24 +15,7 @@ import {Ripple} from 'primeng/ripple';
   templateUrl: './subject-carousel.component.html'
 })
 export class SubjectCarouselComponent {
-  subjects: any[] = [
-    {
-      name: 'Mates',
-      color: 'red'
-    },
-    {
-      name: 'Lengua',
-      color: 'yellow'
-    },
-    {
-      name: 'Física',
-      color: 'green'
-    },
-    {
-      name: 'Química',
-      color: 'green'
-    },
-  ];
+  @Input() currentSubjects!: Subject[];
 
   responsiveOptions = [
     {
@@ -55,6 +39,7 @@ export class SubjectCarouselComponent {
       numScroll: 1
     }
   ];
+
   protected readonly colorPalette = colorPalette;
   protected readonly console = console;
 }
