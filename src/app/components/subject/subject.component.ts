@@ -22,6 +22,7 @@ import {PdfFileService} from '../../services/pdf-file.service';
 import {PdfFile} from '../../models/pdf-file';
 import {TableModule} from 'primeng/table';
 import { saveAs } from 'file-saver';
+import {TaskService} from '../../services/task.service';
 
 @Component({
   selector: 'subject',
@@ -62,6 +63,7 @@ export class SubjectComponent implements OnInit {
     private subjectService: SubjectService,
     private chapterService: ChapterService,
     private pdfFileService: PdfFileService,
+    private taskService: TaskService,
     private router: Router,
     private route: ActivatedRoute) {
   }
@@ -197,6 +199,7 @@ export class SubjectComponent implements OnInit {
   deleteSubject() {
     this.pdfFileService.deleteFileBySubjectId(this.currentSubject.id!).pipe(
       switchMap(() => this.chapterService.deleteAllBySubjectId(this.currentSubject.id!)),
+      switchMap(() => this.taskService.deleteBySubjectId(this.currentSubject.id!)),
       switchMap(() => this.subjectService.deleteById(this.currentSubject.id!)),
       tap(() => this.router.navigate(['/home']))
     ).subscribe({

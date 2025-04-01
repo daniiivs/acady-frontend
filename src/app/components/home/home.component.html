@@ -13,6 +13,7 @@
           <span>¿Qué vas a estudiar hoy?</span>
         </div>
       </ng-template>
+      <ng-template #content>
       @if (currentSubjects.length == 0) {
         <div class="flex flex-column text-center">
           <span class="text-5xl font-bold text-primary">¡Comencemos!</span>
@@ -22,6 +23,7 @@
       } @else {
         <subject-carousel [currentSubjects]="currentSubjects"/>
       }
+      </ng-template>
     </p-card>
     <p-card class="w-full flex flex-column">
       <ng-template #title>

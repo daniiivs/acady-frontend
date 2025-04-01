@@ -5,12 +5,118 @@
       <ng-template #title>
         <div class="flex align-items-center justify-content-between">
           <span class="text-2xl font-bold">Mis tareas</span>
-          <p-button icon="pi pi-plus" label="Tarea" [outlined]="true"/>
+          <p-button icon="pi pi-plus" label="Tarea" [outlined]="true" (onClick)="showNewTaskDialog()"/>
         </div>
       </ng-template>
       <ng-template #subtitle>
         <div>
           <span>¿Qué tienes pendiente por hacer?</span>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        <div class="my-4 mx-5">
+          <p-table [value]="currentTasks" stripedRows sortField="duedate" [sortOrder]="1" [scrollable]="true" scrollHeight="65vh">
+            <ng-template #header>
+              <tr>
+                <th style="width:35%">
+                  Tarea
+                </th>
+                <th style="width:20%">
+                  Asignatura
+                </th>
+                <th pSortableColumn="priority" style="width:15%">
+                  Prioridad <p-sortIcon field="priority" />
+                </th>
+                <th pSortableColumn="duedate" style="width:15%">
+                  Fecha de entrega <p-sortIcon field="duedate" />
+                </th>
+                <th pSortableColumn="completed" style="width:10%">
+                  Completada <p-sortIcon field="completed" />
+                </th>
+                <th style="width:5%">
+                  Eliminar
+                </th>
+              </tr>
+              <tr>
+                <th>
+                </th>
+                <th>
+                  <p-columnFilter field="subjectId" matchMode="equals" [showMenu]="false">
+                    <ng-template #filter let-value let-filter="filterCallback">
+                      <p-select
+                        appendTo="body"
+                        [ngModel]="value"
+                        [options]="currentSubjects"
+                        (onChange)="filter($event.value.id)"
+                        placeholder="Seleccionar">
+                        <ng-template #selectedItem let-selectedSubject>
+                          <div class="flex align-items-center flex-wrap gap-2">
+                            <i class="pi pi-circle-fill" [style.color]="colorPalette[selectedSubject.color][500]"></i>
+                            <span class="pl-2">{{ selectedSubject.name }}</span>
+                          </div>
+                        </ng-template>
+                        <ng-template #item let-subject>
+                          <div class="flex align-items-center flex-wrap gap-2">
+                            <i class="pi pi-circle-fill" [style.color]="colorPalette[subject.color][500]"></i>
+                            <span class="pl-2">{{ subject.name }}</span>
+                          </div>
+                        </ng-template>
+                      </p-select>
+                    </ng-template>
+                  </p-columnFilter>
+                </th>
+                <th>
+                  <p-columnFilter field="priority" matchMode="equals" [showMenu]="false">
+                    <ng-template #filter let-value let-filter="filterCallback">
+                      <p-select
+                        appendTo="body"
+                        [ngModel]="value"
+                        [options]="priorities"
+                        (onChange)="filter($event.value.number)"
+                        placeholder="Seleccionar">
+                        <ng-template #selectedItem let-selectedPriority>
+                          <div class="flex items-center gap-2">
+                            <p-tag [severity]="selectedPriority.severity" [value]="selectedPriority.label"/>
+                          </div>
+                        </ng-template>
+                        <ng-template #item let-priority>
+                          <div class="flex items-center gap-2">
+                            <p-tag [severity]="priority.severity" [value]="priority.label"/>
+                          </div>
+                        </ng-template>
+                      </p-select>
+                    </ng-template>
+                  </p-columnFilter>
+                </th>
+                <th></th>
+                <th>
+                  <p-columnFilter type="boolean" field="completed"></p-columnFilter>
+                </th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-task>
+              <tr>
+                <td>{{ task.description }}</td>
+                <td>
+                  <div class="flex align-items-center flex-wrap gap-2">
+                    <i class="pi pi-circle-fill" [style.color]="colorPalette[getColorById(task.subjectId)][500]"></i>
+                    <span class="pl-2">{{ getNameById(task.subjectId) }}</span>
+                  </div>
+                </td>
+                <td>
+                  <p-tag [severity]="getSeverityByNumber(task.priority)" [value]="getLabelByNumber(task.priority)"/>
+                </td>
+                <td>{{ task.duedate | date: 'dd/MM/yyyy' }}</td>
+                <td>
+                  <p-checkbox [(ngModel)]="task.completed" name="completed" [binary]="true" (onChange)="updateTaskCompletion(task)" />
+                </td>
+                <td>
+                  <p-button class="mr-2" icon="pi pi-times-circle" severity="danger" variant="text" (onClick)="showDeleteTaskDialog(task)"/>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
         </div>
       </ng-template>
     </p-card>
@@ -26,3 +132,93 @@
     </p-toolbar>
   </div>
 </div>
+
+<p-dialog closable="false" [(visible)]="visibleNewTask" [draggable]="false" [modal]="true"
+          [style]="{ width: '25rem' }">
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2">
+      <span class="font-bold whitespace-nowrap text-xl">Añadir tema</span>
+    </div>
+  </ng-template>
+  <form (ngSubmit)="onSubmit(loginForm)" #loginForm="ngForm">
+    <div class="flex flex-column gap-3">
+      <input pInputText
+             placeholder="Tarea"
+             [(ngModel)]="newTask.description"
+             id="description"
+             name="description"
+             #description="ngModel"
+             autocomplete="off"
+             fluid
+             variant="filled"/>
+
+      <p-date-picker [(ngModel)]="newTask.duedate"
+                     [showIcon]="true"
+                     id="date"
+                     name="date"
+                     #date="ngModel"
+                     inputId="buttondisplay"
+                     fluid
+                     dateFormat="dd/mm/yy"
+                     placeholder="Fecha de entrega"
+                     [showOnFocus]="false"
+                     readonlyInput
+                     variant="filled"
+                     appendTo="body"/>
+
+      <p-select [options]="currentSubjects" [(ngModel)]="newTask.subjectId" appendTo="body" optionLabel="name"
+                optionValue="id" variant="filled" placeholder="Asignatura" fluid id="subject" name="subject">
+        <ng-template #selectedItem let-selectedSubject>
+          <div class="flex align-items-center flex-wrap gap-2">
+            <i class="pi pi-circle-fill" [style.color]="colorPalette[selectedSubject.color][500]"></i>
+            <span class="pl-2">{{ selectedSubject.name }}</span>
+          </div>
+        </ng-template>
+        <ng-template #item let-subject>
+          <div class="flex align-items-center flex-wrap gap-2">
+            <i class="pi pi-circle-fill" [style.color]="colorPalette[subject.color][500]"></i>
+            <span class="pl-2">{{ subject.name }}</span>
+          </div>
+        </ng-template>
+      </p-select>
+
+      <p-select [options]="priorities" [(ngModel)]="newTask.priority" appendTo="body" optionLabel="label"
+                optionValue="number" variant="filled" placeholder="Prioridad" fluid id="priority" name="priority">
+        <ng-template #selectedItem let-selectedPriority>
+          <div class="flex items-center gap-2">
+            <p-tag [severity]="selectedPriority.severity" [value]="selectedPriority.label"/>
+          </div>
+        </ng-template>
+        <ng-template #item let-priority>
+          <div class="flex items-center gap-2">
+            <p-tag [severity]="priority.severity" [value]="priority.label"/>
+          </div>
+        </ng-template>
+      </p-select>
+    </div>
+    <div class="flex justify-content-end flex-wrap mt-3">
+      <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary" (click)="resetForm()"/>
+      <p-button label="Añadir" type="submit"/>
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog closable="false" [(visible)]="visibleDeleteTask" [draggable]="false" [modal]="true"
+          [style]="{ width: '25rem' }">
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2">
+      <span class="font-bold whitespace-nowrap text-xl">Eliminar asignatura</span>
+    </div>
+  </ng-template>
+  <div class="flex justify-content-center flex-wrap">
+    <i class="pi pi-exclamation-circle" style="font-size: 80px" [style.color]="colorPalette['red'][600]"></i>
+    <div class="text-center px-2 mt-4">
+      <span>¿Seguro que quieres eliminar la tarea seleccionada?</span>
+    </div>
+  </div>
+  <div class="flex justify-content-end flex-wrap mt-5">
+    <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary"
+              (onClick)="resetTaskToDelete()"/>
+    <p-button label="Eliminar" severity="danger" (onClick)="deleteTask()"/>
+  </div>
+</p-dialog>
