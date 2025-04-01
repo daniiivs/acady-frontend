@@ -1,0 +1,214 @@
+<div class="flex flex-column h-screen">
+  <navbar/>
+  <div class="flex flex-grow-1 flex-column py-4 px-8 gap-4 overflow-auto">
+    <p-card class="flex-shrink-0">
+      <ng-template #title>
+        <div class="flex align-items-center justify-content-between">
+          <span class="text-2xl font-bold text-primary">{{ currentSubject.name }}</span>
+          <div>
+            <p-button class="mr-2" icon="pi pi-plus" (onClick)="showNewChapterDialog()" [outlined]="true"/>
+            <p-button severity="danger" icon="pi pi-trash" (onClick)="showDeleteSubjectDialog()"/>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template #subtitle>
+        <div>
+          <span>¡Échale un vistazo a tus temas!</span>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        @if (currentChapters.length == 0) {
+          <div class="flex flex-column text-center">
+            <span class="text-5xl font-bold text-primary my-3">¡Vaya!</span>
+            <span class="text-xl mb-1">Parece que aun no tienes ningún tema aun...</span>
+            <span class="text-base font-italic mb-3">Prueba a añadir uno haciendo click en el '+'</span>
+          </div>
+        } @else {
+          <div class="my-4 mx-5">
+            <p-accordion [value]="0">
+              @for (chapter of currentChapters; track chapter.number) {
+                <p-accordion-panel [value]="chapter.number">
+                  <p-accordion-header>
+                    <div>
+                      <span class="text-primary-500 font-bold">Tema {{ chapter.number }}: </span>
+                      <span>{{ chapter.name }}</span>
+                    </div>
+                  </p-accordion-header>
+                  <p-accordion-content>
+                    <div class="flex justify-content-between">
+                      <label [for]="'fileInput-' + chapter.id"
+                             class="p-button p-component p-button-text custom-upload-button" pRipple
+                             style="font-size: 14px; cursor: pointer;">
+                        <i class="pi pi-upload"></i>
+                        <span class="p-button-label">Subir documento</span>
+                      </label>
+                      <input [id]="'fileInput-' + chapter.id" accept="application/pdf" type="file"
+                             style="display: none;"
+                             (change)="onFileSelected($event, chapter.id!)"/>
+
+                      <p-button severity="danger" size="small" icon="pi pi-trash" class="mt-2"
+                                (onClick)="showDeleteChapterDialog(chapter)"/>
+                    </div>
+                    <div class="mt-3">
+                      @if (filterByChapterId(chapter.id!).length == 0) {
+                        <div class="flex flex-column text-center">
+                          <span class="text-5xl font-bold text-primary mb-3">¡Ups!</span>
+                          <span class="text-xl mb-1">Aun no has añadido ningún documento a este tema</span>
+                          <span class="text-base font-italic mb-3">¿A qué esperas? ¡Prueba a subir uno!</span>
+                        </div>
+                      } @else {
+                      <p-table
+                        [value]="filterByChapterId(chapter.id!)"
+                        [paginator]="true"
+                        [rows]="5"
+                        [tableStyle]="{ 'min-width': '50rem' }"
+                        stripedRows
+                      >
+                        <ng-template #header>
+                          <tr>
+                            <th pSortableColumn="filename" style="width:90%">Documentos
+                              <p-sortIcon field="filename"/>
+                            </th>
+                            <th style="width:5%"></th>
+                            <th style="width:5%"></th>
+                          </tr>
+                        </ng-template>
+                        <ng-template #body let-file>
+                          <tr>
+                            <td>{{ file.filename }}</td>
+                            <td>
+                              <p-button class="mr-2" icon="pi pi-arrow-circle-down" variant="text"
+                                        (onClick)="downloadPdf(file)"/>
+                            </td>
+                            <td>
+                              <p-button class="mr-2" icon="pi pi-times-circle" severity="danger" variant="text"
+                                        (onClick)="showDeleteDocumentDialog(file)"/>
+                            </td>
+                          </tr>
+                        </ng-template>
+                      </p-table>
+                      }
+                    </div>
+                  </p-accordion-content>
+                </p-accordion-panel>
+              }
+            </p-accordion>
+          </div>
+        }
+      </ng-template>
+    </p-card>
+  </div>
+  <div>
+    <p-toolbar>
+      <ng-template #start>
+        <span class="pl-2 text-primary font-bold">Acady</span>
+      </ng-template>
+      <ng-template #end>
+        <span class="pl-2 text-primary font-bold">2025</span>
+      </ng-template>
+    </p-toolbar>
+  </div>
+</div>
+
+<p-dialog closable="false" [(visible)]="visibleNewChapter" [draggable]="false" [modal]="true"
+          [style]="{ width: '25rem' }">
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2">
+      <span class="font-bold whitespace-nowrap text-xl">Añadir tema</span>
+    </div>
+  </ng-template>
+  <form (ngSubmit)="onSubmit(loginForm)" #loginForm="ngForm">
+    <div class="block">
+      <p-inputgroup class="mb-3">
+        <input pInputText
+               placeholder="Número de tema"
+               [(ngModel)]="newChapter.number"
+               id="number"
+               name="number"
+               #number="ngModel"
+               autocomplete="off"
+               fluid
+               variant="filled"/>
+      </p-inputgroup>
+      <input pInputText
+             placeholder="Nombre"
+             [(ngModel)]="newChapter.name"
+             id="name"
+             name="name"
+             #name="ngModel"
+             autocomplete="off"
+             fluid
+             class="mb-2"
+             variant="filled"/>
+    </div>
+    <div class="flex justify-content-end flex-wrap mt-3">
+      <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary" (click)="resetForm()"/>
+      <p-button label="Añadir" type="submit"/>
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog closable="false" [(visible)]="visibleDeleteDocument" [draggable]="false" [modal]="true"
+          [style]="{ width: '25rem' }">
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2">
+      <span class="font-bold whitespace-nowrap text-xl">Eliminar documento</span>
+    </div>
+  </ng-template>
+  <div class="flex justify-content-center flex-wrap">
+    <i class="pi pi-exclamation-circle" style="font-size: 80px" [style.color]="colorPalette['red'][600]"></i>
+    <div class="text-center px-2 mt-4">
+      <span>¿Seguro que quieres eliminar el documento </span>
+      <span class="font-italic">{{ fileToDelete!.filename }}</span>
+      <span>?</span>
+    </div>
+  </div>
+  <div class="flex justify-content-end flex-wrap mt-5">
+    <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary" (onClick)="resetFileToDelete()"/>
+    <p-button label="Eliminar" severity="danger" (onClick)="deleteFile()"/>
+  </div>
+</p-dialog>
+
+<p-dialog closable="false" [(visible)]="visibleDeleteChapter" [draggable]="false" [modal]="true"
+          [style]="{ width: '25rem' }">
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2">
+      <span class="font-bold whitespace-nowrap text-xl">Eliminar tema</span>
+    </div>
+  </ng-template>
+  <div class="flex justify-content-center flex-wrap">
+    <i class="pi pi-exclamation-circle" style="font-size: 80px" [style.color]="colorPalette['red'][600]"></i>
+    <div class="text-center px-2 mt-4">
+      <span>¿Seguro que quieres eliminar el tema </span>
+      <span class="font-italic">{{ chapterToDelete!.name }}</span>
+      <span>? Se eliminaran todos los documentos.</span>
+    </div>
+  </div>
+  <div class="flex justify-content-end flex-wrap mt-5">
+    <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary" (onClick)="resetChapterToDelete()"/>
+    <p-button label="Eliminar" severity="danger" (onClick)="deleteChapter()"/>
+  </div>
+</p-dialog>
+
+
+<p-dialog closable="false" [(visible)]="visibleDeleteSubject" [draggable]="false" [modal]="true"
+          [style]="{ width: '25rem' }">
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2">
+      <span class="font-bold whitespace-nowrap text-xl">Eliminar asignatura</span>
+    </div>
+  </ng-template>
+  <div class="flex justify-content-center flex-wrap">
+    <i class="pi pi-exclamation-circle" style="font-size: 80px" [style.color]="colorPalette['red'][600]"></i>
+    <div class="text-center px-2 mt-4">
+      <span>¿Seguro que quieres eliminar la asignatura </span>
+      <span class="font-italic">{{ currentSubject.name }}</span>
+      <span>? Se eliminaran todos los temas y documentos.</span>
+    </div>
+  </div>
+  <div class="flex justify-content-end flex-wrap mt-5">
+    <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary"
+              (onClick)="visibleDeleteSubject = false"/>
+    <p-button label="Eliminar" severity="danger" (onClick)="deleteSubject()"/>
+  </div>
+</p-dialog>

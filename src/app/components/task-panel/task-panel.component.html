@@ -1,0 +1,28 @@
+<div class="flex flex-column h-screen">
+  <navbar/>
+  <div class="flex flex-grow-1 flex-column py-4 px-8 gap-4 overflow-auto">
+    <p-card class="flex-shrink-0">
+      <ng-template #title>
+        <div class="flex align-items-center justify-content-between">
+          <span class="text-2xl font-bold">Mis tareas</span>
+          <p-button icon="pi pi-plus" label="Tarea" [outlined]="true"/>
+        </div>
+      </ng-template>
+      <ng-template #subtitle>
+        <div>
+          <span>¿Qué tienes pendiente por hacer?</span>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+  <div>
+    <p-toolbar>
+      <ng-template #start>
+        <span class="pl-2 text-primary font-bold">Acady</span>
+      </ng-template>
+      <ng-template #end>
+        <span class="pl-2 text-primary font-bold">2025</span>
+      </ng-template>
+    </p-toolbar>
+  </div>
+</div>

@@ -1,27 +1,40 @@
 <p-menubar [model]="barItems">
   <ng-template #item let-item>
     @if (item.route) {
-      <p-button [label]="item.label" [icon]="item.icon" variant="text" (onClick)="handleClickButton(item.route)"/>
+      <div class="p-menubar-item-link" (click)="handleClickButton(item.route)">
+        <i [class]="item.icon" class="text-primary"></i>
+        <span class="text-primary font-medium"> {{ item.label }} </span>
+      </div>
     } @else if (item.color) {
-      <div class="p-menubar-item-link">
+      <div class="p-menubar-item-link" (click)="handleClickSubject(item.id)">
         <i class="pi pi-circle-fill" [style.color]="colorPalette[item.color][500]"></i>
-        <span class="pl-2"> {{item.label}} </span>
+        <span class="pl-2"> {{ item.label }} </span>
       </div>
     } @else {
-      <p-button [label]="item.label" [icon]="item.icon" variant="text"/>
+      <div class="p-menubar-item-link">
+        <i [class]="item.icon" class="text-primary"></i>
+        <span class="text-primary font-medium"> {{ item.label }} </span>
+      </div>
     }
   </ng-template>
   <ng-template #end>
-    <p-button [label]="currentStudent?.username || ''" icon="pi pi-user" variant="text" (onClick)="menu.toggle($event)" iconPos="right"/>
+    <p-button [label]="currentStudent.username || ''" icon="pi pi-user" variant="text" (onClick)="menu.toggle($event)"
+              iconPos="right"/>
   </ng-template>
 </p-menubar>
 
 <p-menu #menu [model]="menuItems" [popup]="true">
   <ng-template #item let-item>
     @if (item.label === 'Salir') {
-      <p-button [label]="item.label" [icon]="item.icon" variant="text" severity="danger" fluid (onClick)="handleLogout()"/>
+      <div class="p-menubar-item-link" (click)="handleLogout()">
+        <i [class]="item.icon" class="text-primary"></i>
+        <span class="text-primary font-medium"> {{ item.label }} </span>
+      </div>
     } @else {
-      <p-button [label]="item.label" [icon]="item.icon" variant="text" fluid/>
+      <div class="p-menubar-item-link">
+        <i [class]="item.icon" class="text-primary"></i>
+        <span class="text-primary font-medium"> {{ item.label }} </span>
+      </div>
     }
   </ng-template>
 </p-menu>

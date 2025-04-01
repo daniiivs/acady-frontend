@@ -4,8 +4,8 @@
     <p-card class="flex-shrink-0">
       <ng-template #title>
         <div class="flex align-items-center justify-content-between">
-          <span>Mis asignaturas</span>
-          <p-button class="" icon="pi pi-plus" label="Nueva" [outlined]="true" (onClick)="showDialog()"/>
+          <span class="text-2xl font-bold">Mis asignaturas</span>
+          <p-button icon="pi pi-plus" label="Asignatura" [outlined]="true" (onClick)="showDialog()"/>
         </div>
       </ng-template>
       <ng-template #subtitle>
@@ -13,9 +13,20 @@
           <span>¿Qué vas a estudiar hoy?</span>
         </div>
       </ng-template>
-      <subject-carousel [currentSubjects]="currentSubjects"/>
+      @if (currentSubjects.length == 0) {
+        <div class="flex flex-column text-center">
+          <span class="text-5xl font-bold text-primary">¡Comencemos!</span>
+          <span class="text-xl mb-1">Aun no tienes ninguna asignatura</span>
+          <span class="text-base font-italic mb-3">Prueba a crear una nueva haciendo click en '+ Asignatura'</span>
+        </div>
+      } @else {
+        <subject-carousel [currentSubjects]="currentSubjects"/>
+      }
     </p-card>
-    <p-card header="Tareas pendientes" class="w-full flex flex-column">
+    <p-card class="w-full flex flex-column">
+      <ng-template #title>
+        <span class="text-2xl font-bold">Tareas pendientes</span>
+      </ng-template>
       <div class="overflow-auto" style="height: 30vh">
         <p>
           Lorem ipsum dolor sit amet...
@@ -61,7 +72,10 @@
         </p>
       </div>
     </p-card>
-    <p-card header="Exámenes" class="w-full flex flex-column">
+    <p-card class="w-full flex flex-column">
+      <ng-template #title>
+        <span class="text-2xl font-bold">Exámenes</span>
+      </ng-template>
       <div class="overflow-auto" style="height: 30vh">
         <p>
           Lorem ipsum dolor sit amet...
@@ -158,8 +172,8 @@
              variant="filled"/>
     </div>
     <div class="flex justify-content-end flex-wrap mt-3">
-      <p-button label="Cancelar" [text]="true" severity="secondary" (click)="resetForm()"/>
-      <p-button label="Añadir" [outlined]="true" type="submit" severity="secondary"/>
+      <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary" (click)="resetForm()"/>
+      <p-button label="Añadir" type="submit"/>
     </div>
   </form>
 </p-dialog>
@@ -168,7 +182,7 @@
   <div class="flex gap-2">
     @for (color of colorList; track $index) {
       <div style="width: fit-content">
-        <i (click)="setColor(color, op)" class="pi pi-circle-fill cursor-pointer"
+        <i (click)="setColor(color, op)" pRipple class="pi pi-circle-fill cursor-pointer"
            [style.color]="colorPalette[color][500]"></i>
       </div>
     }

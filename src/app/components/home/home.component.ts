@@ -24,30 +24,26 @@ import {MenuItem, PrimeTemplate} from 'primeng/api';
 import {ScrollPanel} from 'primeng/scrollpanel';
 import {Popover} from 'primeng/popover';
 import {take} from 'rxjs';
+import {Ripple} from "primeng/ripple";
 
 @Component({
   selector: 'home',
-  imports: [
-    NavbarComponent,
-    Card,
-    Toolbar,
-    SubjectCarouselComponent,
-    Button,
-    Dialog,
-    FloatLabel,
-    FormsModule,
-    IconField,
-    InputIcon,
-    InputText,
-    Password,
-    ReactiveFormsModule,
-    InputGroup,
-    InputGroupAddon,
-    Menu,
-    ScrollPanel,
-    Popover,
-    PrimeTemplate
-  ],
+    imports: [
+        NavbarComponent,
+        Card,
+        Toolbar,
+        SubjectCarouselComponent,
+        Button,
+        Dialog,
+        FormsModule,
+        InputText,
+        ReactiveFormsModule,
+        InputGroup,
+        InputGroupAddon,
+        Popover,
+        PrimeTemplate,
+        Ripple
+    ],
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
@@ -59,8 +55,7 @@ export class HomeComponent implements OnInit {
   chosenColor: string = 'gray';
 
   constructor(
-    private subjectService: SubjectService,
-    private router: Router) {
+    private subjectService: SubjectService) {
   }
 
   ngOnInit(): void {
@@ -71,7 +66,7 @@ export class HomeComponent implements OnInit {
     });
 
     this.currentStudent = JSON.parse(localStorage.getItem('currentUser')!);
-    this.subjectService.getSubjects(this.currentStudent.id!).subscribe((subjects: Subject[]) => {
+    this.subjectService.getSubjectList(this.currentStudent.id!).subscribe((subjects: Subject[]) => {
       this.currentSubjects = subjects;
     });
 
@@ -106,8 +101,6 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  protected readonly colorPalette = colorPalette;
-
   setColor(color: string, op: Popover) {
     this.chosenColor = color;
     op.hide();
@@ -118,4 +111,6 @@ export class HomeComponent implements OnInit {
     this.chosenColor = 'gray';
     this.newSubject = new Subject();
   }
+
+  protected readonly colorPalette = colorPalette;
 }

@@ -4,7 +4,7 @@ import {MenuItem} from 'primeng/api';
 import {Button} from 'primeng/button';
 import {Menu} from 'primeng/menu';
 import {AuthService} from '../../services/auth.service';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {take} from 'rxjs';
 import {Student} from '../../models/student';
 import {Subject} from '../../models/subject';
@@ -37,7 +37,7 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentStudent = JSON.parse(localStorage.getItem('currentUser')!);
-    this.subjectService.getSubjects(this.currentStudent.id!).subscribe((subjects: Subject[]) => {
+    this.subjectService.getSubjectList(this.currentStudent.id!).subscribe((subjects: Subject[]) => {
       this.currentSubjects = subjects;
       this.setMenuBar();
     });
@@ -60,7 +60,8 @@ export class NavbarComponent implements OnInit {
     for (const subject of this.currentSubjects) {
       this.subjectsMenu.push({
         label: subject.name,
-        color: subject.color
+        color: subject.color,
+        id: subject.id
       });
     }
 
@@ -83,13 +84,19 @@ export class NavbarComponent implements OnInit {
       {
         label: 'Tareas',
         icon: 'pi pi-list',
-        route: '/login',
+        route: '/tasks',
       }
     ];
   }
 
   handleClickButton(route: string): void {
     void this.router.navigateByUrl(route);
+  }
+
+  handleClickSubject(id: string): void {
+    void this.router.navigateByUrl(`/subject/${id}`).then(() => {
+      window.location.reload();
+    });
   }
 
   handleLogout(): void {
@@ -101,4 +108,5 @@ export class NavbarComponent implements OnInit {
   }
 
   protected readonly colorPalette = colorPalette;
+  protected readonly navigator = navigator;
 }

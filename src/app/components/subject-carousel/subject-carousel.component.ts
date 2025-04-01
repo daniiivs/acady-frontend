@@ -4,13 +4,15 @@ import {NgStyle} from '@angular/common';
 import {colorPalette} from '../../app.config';
 import {Ripple} from 'primeng/ripple';
 import {Subject} from '../../models/subject';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'subject-carousel',
   imports: [
     Carousel,
     NgStyle,
-    Ripple
+    Ripple,
+    RouterLink
   ],
   templateUrl: './subject-carousel.component.html'
 })
@@ -41,5 +43,4 @@ export class SubjectCarouselComponent {
   ];
 
   protected readonly colorPalette = colorPalette;
-  protected readonly console = console;
 }

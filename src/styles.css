@@ -25,3 +25,8 @@ a {
 .p-password .p-password-unmask-icon	{
   margin-right: 0.5rem;
 }
+
+.custom-upload-button i {
+  font-size: 14px;
+  margin-right: 0.25em;
+}

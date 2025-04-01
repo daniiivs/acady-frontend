@@ -1,16 +1,16 @@
 <p-carousel [value]="currentSubjects" [numVisible]="3" [numScroll]="3" [circular]="false"
             [responsiveOptions]="responsiveOptions">
   <ng-template let-subject #item>
-    <div pRipple class="cursor-pointer border border-surface rounded-border m-2 p-4 border-round">
-      <div (click)="console.log(subject.name)">
+    <div pRipple class="cursor-pointer border border-surface rounded-border m-2 p-4 border-round" [routerLink]="['/subject', subject.id]">
         <div class="mb-4">
-          <div class="relative mx-auto border-round" [ngStyle]="{'background-color': colorPalette[subject.color][500]}"
-               style="height: 17vh"></div>
+          <div class="relative mx-auto border-round flex justify-content-center align-content-center flex-wrap" [ngStyle]="{'background-color': colorPalette[subject.color][500]}"
+               style="height: 17vh">
+            <span class="text-7xl font-bold" [style.color]="colorPalette[subject.color][600]">{{subject.code}}</span>
+          </div>
         </div>
         <div class="flex justify-between items-center">
           <div class="mt-0 font-semibold text-xl">{{ subject.name }}</div>
         </div>
       </div>
-    </div>
   </ng-template>
 </p-carousel>

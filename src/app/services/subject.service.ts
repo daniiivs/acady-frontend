@@ -11,11 +11,19 @@ export class SubjectService {
 
   constructor(private http: HttpClient) { }
 
-  getSubjects(studentId: string): Observable<Subject[]> {
+  getSubject(subjectId: string): Observable<Subject> {
+    return this.http.get<Subject>(`${this.url}/${subjectId}`, {withCredentials: true});
+  }
+
+  getSubjectList(studentId: string): Observable<Subject[]> {
     return this.http.get<Subject[]>(`${this.url}/all/${studentId}`, {withCredentials: true});
   }
 
   addSubject(subject: Subject): Observable<void> {
     return this.http.post<void>(`${this.url}/add`, subject, {withCredentials: true});
+  }
+
+  deleteById(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.url}/delete/${id}`, {withCredentials: true});
   }
 }
