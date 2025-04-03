@@ -23,6 +23,10 @@ import {PdfFile} from '../../models/pdf-file';
 import {TableModule} from 'primeng/table';
 import { saveAs } from 'file-saver';
 import {TaskService} from '../../services/task.service';
+import {Task} from '../../models/task';
+import {DatePipe} from '@angular/common';
+import {Tag} from 'primeng/tag';
+import {Checkbox} from 'primeng/checkbox';
 
 @Component({
   selector: 'subject',
@@ -40,19 +44,24 @@ import {TaskService} from '../../services/task.service';
     InputGroup,
     InputText,
     Ripple,
-    TableModule
+    TableModule,
+    DatePipe,
+    Tag,
+    Checkbox
   ],
   templateUrl: './subject.component.html'
 })
 export class SubjectComponent implements OnInit {
   currentSubject: Subject = new Subject();
   currentChapters: Chapter[] = [];
+  currentTasks: Task[] = [];
   currentStudent!: Student;
   currentFiles: PdfFile[] = [];
   newChapter: Chapter = new Chapter();
   fileToUpload!: File;
   fileToDelete: PdfFile = new PdfFile();
   chapterToDelete: Chapter = new Chapter();
+  priorities!: any[];
 
   visibleNewChapter: boolean = false;
   visibleDeleteDocument: boolean = false;
@@ -84,7 +93,17 @@ export class SubjectComponent implements OnInit {
 
     this.pdfFileService.getFilesBySubjectId(subjectId).subscribe((files: PdfFile[] ) => {
       this.currentFiles = files;
-    })
+    });
+
+    this.taskService.getTasksBySubjectId(subjectId).subscribe((tasks: Task[]) => {
+      this.currentTasks = tasks.filter((task: Task) => !task.completed);
+    });
+
+    this.priorities = [
+      { label: 'Alta', number: 1, severity: 'danger' },
+      { label: 'Media', number: 2, severity: 'warn' },
+      { label: 'Baja', number: 3, severity: 'success' },
+    ];
   }
 
   setPrimaryColor(color: string) {
@@ -205,6 +224,18 @@ export class SubjectComponent implements OnInit {
     ).subscribe({
       error: err => console.error(err)
     });
+  }
+
+  updateTaskCompletion(task: any) {
+    this.taskService.addTask(task).pipe(take(1)).subscribe({});
+  }
+
+  getLabelByNumber(number: number): string {
+    return this.priorities.find(priority => priority.number === number)?.label;
+  }
+
+  getSeverityByNumber(number: number): "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | undefined {
+    return this.priorities.find(priority => priority.number === number)?.severity as "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | undefined;
   }
 
   protected readonly colorPalette = colorPalette;

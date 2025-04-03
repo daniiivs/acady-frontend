@@ -10,13 +10,15 @@ import {Student} from '../../models/student';
 import {Subject} from '../../models/subject';
 import {SubjectService} from '../../services/subject.service';
 import {colorPalette} from '../../app.config';
+import {TieredMenu} from 'primeng/tieredmenu';
 
 @Component({
   selector: 'navbar',
   imports: [
     Menubar,
     Button,
-    Menu
+    Menu,
+    TieredMenu
   ],
   templateUrl: './navbar.component.html'
 })

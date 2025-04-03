@@ -25,37 +25,48 @@ import {ScrollPanel} from 'primeng/scrollpanel';
 import {Popover} from 'primeng/popover';
 import {take} from 'rxjs';
 import {Ripple} from "primeng/ripple";
+import {TableModule} from 'primeng/table';
+import {Tag} from 'primeng/tag';
+import {Task} from '../../models/task';
+import {DatePipe} from '@angular/common';
+import {TaskService} from '../../services/task.service';
 
 @Component({
   selector: 'home',
-    imports: [
-        NavbarComponent,
-        Card,
-        Toolbar,
-        SubjectCarouselComponent,
-        Button,
-        Dialog,
-        FormsModule,
-        InputText,
-        ReactiveFormsModule,
-        InputGroup,
-        InputGroupAddon,
-        Popover,
-        PrimeTemplate,
-        Ripple
-    ],
+  imports: [
+    NavbarComponent,
+    Card,
+    Toolbar,
+    SubjectCarouselComponent,
+    Button,
+    Dialog,
+    FormsModule,
+    InputText,
+    ReactiveFormsModule,
+    InputGroup,
+    InputGroupAddon,
+    Popover,
+    PrimeTemplate,
+    Ripple,
+    TableModule,
+    Tag,
+    DatePipe
+  ],
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
   currentStudent!: Student;
   currentSubjects: Subject[] = [];
+  currentTasks: Task[] = [];
   newSubject: Subject = new Subject();
   visible: boolean = false;
   colorList: string[] = [];
   chosenColor: string = 'gray';
+  priorities!: any[];
 
   constructor(
-    private subjectService: SubjectService) {
+    private subjectService: SubjectService,
+    private taskService: TaskService) {
   }
 
   ngOnInit(): void {
@@ -69,6 +80,16 @@ export class HomeComponent implements OnInit {
     this.subjectService.getSubjectList(this.currentStudent.id!).subscribe((subjects: Subject[]) => {
       this.currentSubjects = subjects;
     });
+
+    this.taskService.getTasksByStudentId(this.currentStudent.id!).subscribe((tasks: Task[]) => {
+      this.currentTasks = tasks.filter((task: Task) => !task.completed);
+    });
+
+    this.priorities = [
+      { label: 'Alta', number: 1, severity: 'danger' },
+      { label: 'Media', number: 2, severity: 'warn' },
+      { label: 'Baja', number: 3, severity: 'success' },
+    ];
 
     for (const color in colorPalette) {
       if (color == 'gray') {
@@ -110,6 +131,22 @@ export class HomeComponent implements OnInit {
     this.visible = false
     this.chosenColor = 'gray';
     this.newSubject = new Subject();
+  }
+
+  getColorById(id: string): string {
+    return this.currentSubjects.find(subject => subject.id === id)?.color!;
+  }
+
+  getNameById(id: string): string {
+    return this.currentSubjects.find(subject => subject.id === id)?.name!;
+  }
+
+  getLabelByNumber(number: number): string {
+    return this.priorities.find(priority => priority.number === number)?.label;
+  }
+
+  getSeverityByNumber(number: number): "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | undefined {
+    return this.priorities.find(priority => priority.number === number)?.severity as "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | undefined;
   }
 
   protected readonly colorPalette = colorPalette;
