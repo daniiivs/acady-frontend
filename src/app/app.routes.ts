@@ -4,6 +4,7 @@ import {RegisterComponent} from './components/register/register.component';
 import {HomeComponent} from './components/home/home.component';
 import {SubjectComponent} from './components/subject/subject.component';
 import {TaskPanelComponent} from './components/task-panel/task-panel.component';
+import {ExamPanelComponent} from './components/exam-panel/exam-panel.component';
 
 export const routes: Routes = [
   {
@@ -30,5 +31,9 @@ export const routes: Routes = [
   {
     path: 'tasks',
     component: TaskPanelComponent
+  },
+  {
+    path: 'exams',
+    component: ExamPanelComponent
   }
 ];

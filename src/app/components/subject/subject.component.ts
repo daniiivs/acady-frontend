@@ -27,6 +27,9 @@ import {Task} from '../../models/task';
 import {DatePipe} from '@angular/common';
 import {Tag} from 'primeng/tag';
 import {Checkbox} from 'primeng/checkbox';
+import {ExamService} from '../../services/exam.service';
+import {Select} from 'primeng/select';
+import {Exam} from '../../models/exam';
 
 @Component({
   selector: 'subject',
@@ -41,13 +44,12 @@ import {Checkbox} from 'primeng/checkbox';
     AccordionContent,
     Dialog,
     FormsModule,
-    InputGroup,
     InputText,
     Ripple,
     TableModule,
     DatePipe,
     Tag,
-    Checkbox
+    Checkbox,
   ],
   templateUrl: './subject.component.html'
 })
@@ -57,11 +59,14 @@ export class SubjectComponent implements OnInit {
   currentTasks: Task[] = [];
   currentStudent!: Student;
   currentFiles: PdfFile[] = [];
+  currentExams: Exam[] = [];
   newChapter: Chapter = new Chapter();
   fileToUpload!: File;
   fileToDelete: PdfFile = new PdfFile();
   chapterToDelete: Chapter = new Chapter();
   priorities!: any[];
+  isInvalid: boolean = false;
+  errorMessage: string = '';
 
   visibleNewChapter: boolean = false;
   visibleDeleteDocument: boolean = false;
@@ -72,6 +77,7 @@ export class SubjectComponent implements OnInit {
     private subjectService: SubjectService,
     private chapterService: ChapterService,
     private pdfFileService: PdfFileService,
+    private examService: ExamService,
     private taskService: TaskService,
     private router: Router,
     private route: ActivatedRoute) {
@@ -99,6 +105,10 @@ export class SubjectComponent implements OnInit {
       this.currentTasks = tasks.filter((task: Task) => !task.completed);
     });
 
+    this.examService.getExamsBySubjectId(subjectId).subscribe((exams: Exam[]) => {
+      this.currentExams = exams.filter((exam: Exam) => !exam.completed);
+    })
+
     this.priorities = [
       { label: 'Alta', number: 1, severity: 'danger' },
       { label: 'Media', number: 2, severity: 'warn' },
@@ -118,16 +128,36 @@ export class SubjectComponent implements OnInit {
     this.newChapter.subjectId = this.currentSubject.id!;
     this.newChapter.studentId = this.currentStudent.id!;
 
+    if (this.newChapter.number <= 0) {
+      this.isInvalid = true;
+      this.errorMessage = '* El número de tema debe ser mayor que 0';
+      return;
+    }
+
+    if (this.currentChapters.filter((chapter: Chapter) => chapter.number == this.newChapter.number).length > 0) {
+      this.isInvalid = true;
+      this.errorMessage = '* Ya tienes un tema asignado al número ' + this.newChapter.number;
+      return;
+    }
+
     this.chapterService.addChapter(this.newChapter).pipe(take(1)).subscribe({
       next: () => {
         this.resetForm();
         this.visibleNewChapter = false;
         window.location.reload();
       },
-      error: (err) => {
-        console.log(err);
+      error: () => {
+        this.isInvalid = true;
+        this.errorMessage = '* Ingresa un número válido';
       }
     });
+  }
+
+  formIsFilled() {
+    if (this.newChapter.number !== undefined) {
+      return this.newChapter.name.trim() !== '' && this.newChapter.number.toString().trim() !== '';
+    }
+    return false;
   }
 
   showNewChapterDialog() {
@@ -150,6 +180,8 @@ export class SubjectComponent implements OnInit {
 
   resetForm() {
     this.visibleNewChapter = false
+    this.errorMessage = '';
+    this.isInvalid = false;
     this.newChapter = new Chapter();
   }
 
@@ -208,6 +240,7 @@ export class SubjectComponent implements OnInit {
 
   deleteChapter() {
     this.pdfFileService.deleteFileByChapterId(this.chapterToDelete.id!).pipe(
+      switchMap(() => this.examService.deleteByChapterId(this.chapterToDelete.id!)),
       switchMap(() => this.chapterService.deleteById(this.chapterToDelete.id!)),
       tap(() => window.location.reload())
     ).subscribe({
@@ -217,6 +250,7 @@ export class SubjectComponent implements OnInit {
 
   deleteSubject() {
     this.pdfFileService.deleteFileBySubjectId(this.currentSubject.id!).pipe(
+      switchMap(() => this.examService.deleteBySubjectId(this.currentSubject.id!)),
       switchMap(() => this.chapterService.deleteAllBySubjectId(this.currentSubject.id!)),
       switchMap(() => this.taskService.deleteBySubjectId(this.currentSubject.id!)),
       switchMap(() => this.subjectService.deleteById(this.currentSubject.id!)),
@@ -236,6 +270,12 @@ export class SubjectComponent implements OnInit {
 
   getSeverityByNumber(number: number): "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | undefined {
     return this.priorities.find(priority => priority.number === number)?.severity as "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | undefined;
+  }
+
+  getChaptersByExamId(exam: Exam) {
+    return exam.chapterIds
+      .map(id => this.currentChapters.find(chapter => chapter.id === id)!)
+      .sort((a, b) => a.number - b.number);
   }
 
   protected readonly colorPalette = colorPalette;

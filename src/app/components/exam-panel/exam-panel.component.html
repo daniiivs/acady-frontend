@@ -4,49 +4,55 @@
     <p-card class="flex-shrink-0">
       <ng-template #title>
         <div class="flex align-items-center justify-content-between">
-          <span class="text-2xl font-bold">Mis tareas</span>
-          <p-button icon="pi pi-plus" label="Tarea" [outlined]="true" (onClick)="showNewTaskDialog()" [disabled]="currentSubjects.length == 0"/>
+          <span class="text-2xl font-bold">Mis exámenes</span>
+          <p-button icon="pi pi-plus" label="Examen" [outlined]="true" (onClick)="showNewExamDialog()"
+                    [disabled]="currentChapters.length == 0"/>
         </div>
       </ng-template>
       <ng-template #subtitle>
         <div>
-          <span>¿Qué tienes pendiente por hacer?</span>
+          <span>¿Qué exámenes están por venir?</span>
         </div>
       </ng-template>
       <ng-template #content>
         @if (currentSubjects.length == 0) {
           <div class="flex flex-column text-center">
             <span class="text-5xl font-bold text-primary my-3">¡Aun no tienes asignaturas!</span>
-            <span class="text-xl mb-1">Debes tener al menos una asignatura para crear una tarea</span>
+            <span class="text-xl mb-1">Debes tener al menos una asignatura para crear un examen</span>
             <span class="text-base font-italic mb-3">Vuelve al inicio para crear una asignatura</span>
           </div>
-        } @else if (currentTasks.length == 0) {
+        } @else if (currentChapters.length == 0) {
           <div class="flex flex-column text-center">
-            <span class="text-5xl font-bold text-primary my-3">¿Tienes algo que hacer?</span>
-            <span class="text-xl mb-1">Aun no has añadido ninguna tarea</span>
-            <span class="text-base font-italic mb-3">¡Prueba a crear una nueva!</span>
+            <span class="text-5xl font-bold text-primary my-3">¡Aun no tienes temas!</span>
+            <span class="text-xl mb-1">Aun no has añadido temas a ninguna de tus asignaturas</span>
+            <span class="text-base font-italic mb-3">Crea un tema en una asignatura para poder añadir exámenes</span>
           </div>
-        } @else {
+        } @else if (currentExams.length == 0) {
+          <div class="flex flex-column text-center">
+            <span class="text-5xl font-bold text-primary my-3">¿Tienes un examen pronto?</span>
+            <span class="text-xl mb-1">Aun no has añadido ningún examen</span>
+            <span class="text-base font-italic mb-3">¡Prueba a añadir uno!</span>
+          </div>
+        } @else () {
           <div class="my-4 mx-5">
-            <p-table [value]="currentTasks" stripedRows sortField="duedate" [sortOrder]="1" [scrollable]="true"
+            <p-table [value]="currentExams" stripedRows sortField="date" [sortOrder]="1" [scrollable]="true"
                      scrollHeight="65vh">
               <ng-template #header>
                 <tr>
-                  <th style="width:35%">
-                    Tarea
-                  </th>
-                  <th style="width:20%">
+                  <th style="width:10%">
                     Asignatura
                   </th>
-                  <th pSortableColumn="priority" style="width:15%">
-                    Prioridad
-                    <p-sortIcon field="priority"/>
+                  <th style="width:25%">
+                    Temas
                   </th>
-                  <th pSortableColumn="duedate" style="width:15%">
-                    Fecha de entrega
-                    <p-sortIcon field="duedate"/>
+                  <th style="width:10%">
+                    Nota
                   </th>
-                  <th pSortableColumn="completed" style="width:10%">
+                  <th pSortableColumn="date" style="width:10%">
+                    Fecha
+                    <p-sortIcon field="date"/>
+                  </th>
+                  <th pSortableColumn="completed" style="width:5%">
                     Completada
                     <p-sortIcon field="completed"/>
                   </th>
@@ -55,8 +61,6 @@
                   </th>
                 </tr>
                 <tr>
-                  <th>
-                  </th>
                   <th>
                     <p-columnFilter field="subjectId" matchMode="equals" [showMenu]="false">
                       <ng-template #filter let-value let-filter="filterCallback">
@@ -82,29 +86,8 @@
                       </ng-template>
                     </p-columnFilter>
                   </th>
-                  <th>
-                    <p-columnFilter field="priority" matchMode="equals" [showMenu]="false">
-                      <ng-template #filter let-value let-filter="filterCallback">
-                        <p-select
-                          appendTo="body"
-                          [ngModel]="value"
-                          [options]="priorities"
-                          (onChange)="filter($event.value.number)"
-                          placeholder="Seleccionar">
-                          <ng-template #selectedItem let-selectedPriority>
-                            <div class="flex items-center gap-2">
-                              <p-tag [severity]="selectedPriority.severity" [value]="selectedPriority.label"/>
-                            </div>
-                          </ng-template>
-                          <ng-template #item let-priority>
-                            <div class="flex items-center gap-2">
-                              <p-tag [severity]="priority.severity" [value]="priority.label"/>
-                            </div>
-                          </ng-template>
-                        </p-select>
-                      </ng-template>
-                    </p-columnFilter>
-                  </th>
+                  <th></th>
+                  <th></th>
                   <th></th>
                   <th>
                     <p-columnFilter type="boolean" field="completed"></p-columnFilter>
@@ -112,26 +95,32 @@
                   <th></th>
                 </tr>
               </ng-template>
-              <ng-template #body let-task>
+              <ng-template #body let-exam>
                 <tr>
-                  <td>{{ task.description }}</td>
                   <td>
                     <div class="flex align-items-center flex-wrap gap-2">
-                      <i class="pi pi-circle-fill" [style.color]="colorPalette[getColorById(task.subjectId)][500]"></i>
-                      <span class="pl-2">{{ getNameById(task.subjectId) }}</span>
+                      <i class="pi pi-circle-fill" [style.color]="colorPalette[getColorById(exam.subjectId)][500]"></i>
+                      <span class="pl-2">{{ getNameById(exam.subjectId) }}</span>
                     </div>
                   </td>
                   <td>
-                    <p-tag [severity]="getSeverityByNumber(task.priority)" [value]="getLabelByNumber(task.priority)"/>
+                    @for (chapter of getChaptersByExamId(exam); track $index) {
+                      <p-tag class="mx-1" [value]="'Tema ' + chapter.number"/>
+                    }
                   </td>
-                  <td>{{ task.duedate | date: 'dd/MM/yyyy' }}</td>
+                  <td>@if (exam.grade) {
+                    {{ exam.grade }}
+                  } @else {
+                    <span>Pendiente</span>
+                  }</td>
+                  <td>{{ exam.date | date: 'dd/MM/yyyy' }}</td>
                   <td>
-                    <p-checkbox [(ngModel)]="task.completed" name="completed" [binary]="true"
-                                (onChange)="updateTaskCompletion(task)"/>
+                    <p-checkbox [(ngModel)]="exam.completed" name="completed" [binary]="true"
+                                (onChange)="completedChanged(exam)"/>
                   </td>
                   <td>
                     <p-button class="mr-2" icon="pi pi-times-circle" severity="danger" variant="text"
-                              (onClick)="showDeleteTaskDialog(task)"/>
+                              (onClick)="showDeleteExamDialog(exam)"/>
                   </td>
                 </tr>
               </ng-template>
@@ -153,26 +142,16 @@
   </div>
 </div>
 
-<p-dialog closable="false" [(visible)]="visibleNewTask" [draggable]="false" [modal]="true"
+<p-dialog closable="false" [(visible)]="visibleNewExam" [draggable]="false" [modal]="true"
           [style]="{ width: '25rem' }">
   <ng-template #header>
     <div class="inline-flex items-center justify-center gap-2">
       <span class="font-bold whitespace-nowrap text-xl">Añadir tema</span>
     </div>
   </ng-template>
-  <form (ngSubmit)="onSubmit(loginForm)" #loginForm="ngForm">
+  <form (ngSubmit)="onSubmitNewExam(loginForm)" #loginForm="ngForm">
     <div class="flex flex-column gap-3">
-      <input pInputText
-             placeholder="Tarea"
-             [(ngModel)]="newTask.description"
-             id="description"
-             name="description"
-             #description="ngModel"
-             autocomplete="off"
-             fluid
-             variant="filled"/>
-
-      <p-date-picker [(ngModel)]="newTask.duedate"
+      <p-date-picker [(ngModel)]="newExam.date"
                      [showIcon]="true"
                      id="date"
                      name="date"
@@ -180,14 +159,15 @@
                      inputId="buttondisplay"
                      fluid
                      dateFormat="dd/mm/yy"
-                     placeholder="Fecha de entrega"
+                     placeholder="Fecha"
                      [showOnFocus]="false"
                      readonlyInput
                      variant="filled"
                      appendTo="body"/>
 
-      <p-select [options]="currentSubjects" [(ngModel)]="newTask.subjectId" appendTo="body" optionLabel="name"
-                optionValue="id" variant="filled" placeholder="Asignatura" fluid id="subject" name="subject">
+      <p-select [options]="currentSubjects" [(ngModel)]="newExam.subjectId" appendTo="body" optionLabel="name"
+                optionValue="id" variant="filled" placeholder="Asignatura" fluid id="subject" name="subject"
+                (onChange)="resetNewChapters()">
         <ng-template #selectedItem let-selectedSubject>
           <div class="flex align-items-center flex-wrap gap-2">
             <i class="pi pi-circle-fill" [style.color]="colorPalette[selectedSubject.color][500]"></i>
@@ -202,21 +182,23 @@
         </ng-template>
       </p-select>
 
-      <p-select [options]="priorities" [(ngModel)]="newTask.priority" appendTo="body" optionLabel="label"
-                optionValue="number" variant="filled" placeholder="Prioridad" fluid id="priority" name="priority">
-        <ng-template #selectedItem let-selectedPriority>
+      <p-multi-select [options]="filterChapterByChosenSubject()" [(ngModel)]="newExam.chapterIds" appendTo="body"
+                      filter="false" showToggleAll="false" [maxSelectedLabels]="8" [selectedItemsLabel]="'{0} temas seleccionados'"
+                      [emptyMessage]="newExam.subjectId? 'No existen temas en esta asignatura' : 'Selecciona una asignatura'"
+                      optionValue="id" optionLabel="number" variant="filled" placeholder="Temas" fluid id="chapters"
+                      name="chapters" (onChange)="sortSelectedChapters()">
+        <ng-template #selectedItems let-selectedChapter>
           <div class="flex items-center gap-2">
-            <p-tag [severity]="selectedPriority.severity" [value]="selectedPriority.label"/>
+            <div>Tema {{ selectedChapter.number }}: {{ selectedChapter.name }}</div>
           </div>
         </ng-template>
-        <ng-template #item let-priority>
+        <ng-template let-chapter #item>
           <div class="flex items-center gap-2">
-            <p-tag [severity]="priority.severity" [value]="priority.label"/>
+            <div>Tema {{ chapter.number }}: {{ chapter.name }}</div>
           </div>
         </ng-template>
-      </p-select>
+      </p-multi-select>
     </div>
-
     <div class="flex justify-content-end flex-wrap mt-3">
       <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary" (click)="resetForm()"/>
       <p-button label="Añadir" type="submit" [disabled]="!formIsFilled()"/>
@@ -224,22 +206,55 @@
   </form>
 </p-dialog>
 
-<p-dialog closable="false" [(visible)]="visibleDeleteTask" [draggable]="false" [modal]="true"
+
+<p-dialog closable="false" [(visible)]="visibleDeleteExam" [draggable]="false" [modal]="true"
           [style]="{ width: '25rem' }">
   <ng-template #header>
     <div class="inline-flex items-center justify-center gap-2">
-      <span class="font-bold whitespace-nowrap text-xl">Eliminar asignatura</span>
+      <span class="font-bold whitespace-nowrap text-xl">Eliminar examen</span>
     </div>
   </ng-template>
   <div class="flex justify-content-center flex-wrap">
     <i class="pi pi-exclamation-circle" style="font-size: 80px" [style.color]="colorPalette['red'][600]"></i>
     <div class="text-center px-2 mt-4">
-      <span>¿Seguro que quieres eliminar la tarea seleccionada?</span>
+      <span>¿Seguro que quieres eliminar el examen seleccionado?</span>
     </div>
   </div>
   <div class="flex justify-content-end flex-wrap mt-5">
     <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary"
-              (onClick)="resetTaskToDelete()"/>
-    <p-button label="Eliminar" severity="danger" (onClick)="deleteTask()"/>
+              (onClick)="resetExamToDelete()"/>
+    <p-button label="Eliminar" severity="danger" (onClick)="deleteExam()"/>
   </div>
+</p-dialog>
+
+<p-dialog closable="false" [(visible)]="visibleCompletedExam" [draggable]="false" [modal]="true"
+          [style]="{ width: '25rem' }">
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2">
+      <span class="font-bold whitespace-nowrap text-xl">Examen completado</span>
+    </div>
+  </ng-template>
+  <div class="flex justify-content-center flex-wrap">
+    <i class="pi pi-check-circle" style="font-size: 80px" [style.color]="colorPalette['emerald'][500]"></i>
+    <div class="text-center px-2 mt-4">
+      <span>¡Uno menos! ¿Qué nota has sacado?</span>
+    </div>
+  </div>
+  <form (ngSubmit)="onSubmitCompletedExam()">
+    <div class="flex flex-column my-4 mx-8">
+      <input pInputText
+             [(ngModel)]="completedExam.grade"
+             id="grade"
+             name="grade"
+             #grade="ngModel"
+             fluid
+             placeholder="Nota"
+             variant="filled">
+    </div>
+    <div class="flex justify-content-end flex-wrap mt-3">
+      <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary" (click)="resetCompletedExam()"/>
+      <p-button label="Guardar" type="submit"/>
+    </div>
+  </form>
+
 </p-dialog>

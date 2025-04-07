@@ -81,7 +81,7 @@ export class NavbarComponent implements OnInit {
       {
         label: 'Exámenes',
         icon: 'pi pi-pencil',
-        route: '/login',
+        route: '/exams',
       },
       {
         label: 'Tareas',

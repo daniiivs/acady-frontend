@@ -79,7 +79,7 @@ export class TaskPanelComponent implements OnInit {
       { label: 'Alta', number: 1, severity: 'danger' },
       { label: 'Media', number: 2, severity: 'warn' },
       { label: 'Baja', number: 3, severity: 'success' },
-    ]
+    ];
   }
 
   showNewTaskDialog() {
@@ -148,5 +148,12 @@ export class TaskPanelComponent implements OnInit {
 
   updateTaskCompletion(task: any) {
     this.taskService.addTask(task).pipe(take(1)).subscribe({});
+  }
+
+  formIsFilled(): boolean {
+    return this.newTask.description.trim() !== '' &&
+      this.newTask.duedate !== undefined &&
+      this.newTask.subjectId !== undefined &&
+      this.newTask.priority !== undefined;
   }
 }

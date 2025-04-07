@@ -12,12 +12,16 @@ export class ChapterService {
   constructor(private http: HttpClient) {
   }
 
+  getChaptersByStudentId(studentId: string): Observable<Chapter[]> {
+    return this.http.get<Chapter[]>(`${this.url}/student/${studentId}`, { withCredentials: true });
+  }
+
   getCurrentChapters(subjectId: string): Observable<Chapter[]> {
     return this.http.get<Chapter[]>(`${this.url}/all/${subjectId}`, { withCredentials: true });
   }
 
-  addChapter(Chapter: Chapter): Observable<void> {
-    return this.http.post<void>(`${this.url}/add`, Chapter, {withCredentials: true});
+  addChapter(chapter: Chapter): Observable<void> {
+    return this.http.post<void>(`${this.url}/add`, chapter, {withCredentials: true});
   }
 
   deleteById(id: string): Observable<void> {

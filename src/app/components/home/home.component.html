@@ -82,50 +82,56 @@
       <ng-template #title>
         <span class="text-2xl font-bold">Exámenes</span>
       </ng-template>
-      <div class="overflow-auto" style="height: 30vh">
-        <p>
-          Lorem ipsum dolor sit amet...
-        </p>
-        <p>
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium...
-        </p>
-        <p>
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium...
-        </p>
-        <p>
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium...
-        </p>
-        <p>
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium...
-        </p>
-        <p>
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium...
-        </p>
-        <p>
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium...
-        </p>
-        <p>
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium...
-        </p>
-        <p>
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium...
-        </p>
-        <p class="m-0">
-          At vero eos et accusamus et iusto odio dignissimos...
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet...
-        </p>
-        <p>
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium...
-        </p>
-        <p>
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium...
-        </p>
-        <p class="m-0">
-          At vero eos et accusamus et iusto odio dignissimos...
-        </p>
-      </div>
+        @if (currentExams.length == 0) {
+          <div class="flex flex-column text-center">
+            <span class="text-5xl font-bold text-primary my-3">¡Estás de suerte!</span>
+            <span class="text-xl mb-1">Parece que no tienes ningún examen pronto</span>
+            <span class="text-base font-italic mb-3">¡No dejes de estudiar!</span>
+          </div>
+        } @else {
+          <div class="my-4 mx-5">
+            <p-table [value]="currentExams" stripedRows sortField="date" [sortOrder]="1" [scrollable]="true"
+                     scrollHeight="65vh">
+              <ng-template #header>
+                <tr>
+                  <th style="width:20%">
+                    Asignatura
+                  </th>
+                  <th style="width:40%">
+                    Temas
+                  </th>
+                  <th style="width:20%">
+                    Nota
+                  </th>
+                  <th style="width:20%">
+                    Fecha
+                  </th>
+                </tr>
+              </ng-template>
+              <ng-template #body let-exam>
+                <tr>
+                  <td>
+                    <div class="flex align-items-center flex-wrap gap-2">
+                      <i class="pi pi-circle-fill" [style.color]="colorPalette[getColorById(exam.subjectId)][500]"></i>
+                      <span class="pl-2">{{ getNameById(exam.subjectId) }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    @for (chapter of getChaptersByExamId(exam); track $index) {
+                      <p-tag class="mx-1" [value]="'Tema ' + chapter.number"/>
+                    }
+                  </td>
+                  <td>@if (exam.grade) {
+                    {{ exam.grade }}
+                  } @else {
+                    <span>Pendiente</span>
+                  }</td>
+                  <td>{{ exam.date | date: 'dd/MM/yyyy' }}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        }
     </p-card>
     }
   </div>
@@ -175,12 +181,20 @@
              #code="ngModel"
              autocomplete="off"
              fluid
-             class="mb-2"
              variant="filled"/>
     </div>
+
+    @if (isInvalid) {
+      <div class="flex justify-content-end pt-2 pb-3">
+        <small class="text-red-600">
+          {{ this.errorMessage }}
+        </small>
+      </div>
+    }
+
     <div class="flex justify-content-end flex-wrap mt-3">
       <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary" (click)="resetForm()"/>
-      <p-button label="Añadir" type="submit"/>
+      <p-button label="Añadir" type="submit" [disabled]="!formIsFilled()"/>
     </div>
   </form>
 </p-dialog>
