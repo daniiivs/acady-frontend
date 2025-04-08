@@ -24,6 +24,7 @@ import {Chapter} from '../../models/chapter';
 import {ChapterService} from '../../services/chapter.service';
 import {take} from 'rxjs';
 import {MultiSelect} from 'primeng/multiselect';
+import {AiExamTableComponent} from '../ai-exam-table/ai-exam-table.component';
 
 @Component({
   selector: 'exam-panel',
@@ -42,7 +43,8 @@ import {MultiSelect} from 'primeng/multiselect';
     TableModule,
     Tag,
     Toolbar,
-    MultiSelect
+    MultiSelect,
+    AiExamTableComponent
   ],
   templateUrl: './exam-panel.component.html'
 })
@@ -54,10 +56,13 @@ export class ExamPanelComponent implements OnInit {
   newExam: Exam = new Exam();
   examToDelete: Exam = new Exam();
   completedExam: Exam = new Exam();
+  selectedExam: Exam = new Exam();
+  examIDForAIExam!: string;
 
   visibleNewExam: boolean = false;
   visibleDeleteExam: boolean = false;
   visibleCompletedExam: boolean = false;
+  visibleAIExam: boolean = false;
 
   constructor(
     private subjectService: SubjectService,
@@ -193,4 +198,14 @@ export class ExamPanelComponent implements OnInit {
   }
 
   protected readonly colorPalette = colorPalette;
+
+  onRowSelect($event: any) {
+    this.examIDForAIExam = $event.data.id;
+    this.visibleAIExam = true;
+  }
+
+  handleDialogClose() {
+    this.selectedExam = new Exam();
+    this.visibleAIExam = false;
+  }
 }

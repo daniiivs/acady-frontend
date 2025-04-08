@@ -1,0 +1,50 @@
+<p-dialog
+  header="Header"
+  [draggable]="false"
+  [resizable]="false"
+  [modal]="true"
+  [maximizable]="true"
+  appendTo="body"
+  [(visible)]="dialogVisible"
+  [style]="{ width: '75vw' }"
+  [contentStyle]="{ height: '500px' }"
+  (onShow)="updateFilteredExams()"
+  (onHide)="closeDialog()"
+>
+  @if (filteredExams.length == 0 && !loading) {
+    <div class="flex flex-column align-items-center">
+      <span class="text-5xl font-bold text-primary my-3">Vaya...</span>
+      <span class="text-xl mb-1">Aun no tienes exámenes generados por IA en este tema</span>
+      <span class="text-base font-italic mb-3">Genera uno para empezar a practicar</span>
+    </div>
+  } @else {
+    <p-table [loading]="loading" showLoader="false" [value]="filteredExams" [scrollable]="true" scrollHeight="flex" [tableStyle]="{ 'min-width': '50rem' }">
+      <ng-template #header>
+        <tr>
+          <th>Examen</th>
+          <th>Nota</th>
+          <th>Ver</th>
+          <th>Eliminar</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-exam>
+        <tr>
+          <td>Examen</td>
+          <td>Nota</td>
+          <td>Ver</td>
+          <td>Eliminar</td>
+        </tr>
+      </ng-template>
+      <ng-template #loadingbody>
+        <tr>
+          <td colspan="4">
+            <p-progress-bar mode="indeterminate" [style]="{ height: '6px' }"></p-progress-bar>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+    <ng-template #footer>
+      <p-button class="mt-4" label="Generar examen" (onClick)="generateAIExam()" [disabled]="loading"/>
+    </ng-template>
+</p-dialog>

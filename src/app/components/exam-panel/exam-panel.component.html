@@ -36,7 +36,7 @@
         } @else () {
           <div class="my-4 mx-5">
             <p-table [value]="currentExams" stripedRows sortField="date" [sortOrder]="1" [scrollable]="true"
-                     scrollHeight="65vh">
+                     scrollHeight="65vh" selectionMode="single" [(selection)]="selectedExam" (onRowSelect)="onRowSelect($event)" dataKey="id">
               <ng-template #header>
                 <tr>
                   <th style="width:10%">
@@ -48,11 +48,11 @@
                   <th style="width:10%">
                     Nota
                   </th>
-                  <th pSortableColumn="date" style="width:10%">
+                  <th pSortableColumn="date" style="width:7%">
                     Fecha
                     <p-sortIcon field="date"/>
                   </th>
-                  <th pSortableColumn="completed" style="width:5%">
+                  <th pSortableColumn="completed" style="width:8%">
                     Completada
                     <p-sortIcon field="completed"/>
                   </th>
@@ -96,7 +96,7 @@
                 </tr>
               </ng-template>
               <ng-template #body let-exam>
-                <tr>
+                <tr [pSelectableRow]="exam">
                   <td>
                     <div class="flex align-items-center flex-wrap gap-2">
                       <i class="pi pi-circle-fill" [style.color]="colorPalette[getColorById(exam.subjectId)][500]"></i>
@@ -206,7 +206,6 @@
   </form>
 </p-dialog>
 
-
 <p-dialog closable="false" [(visible)]="visibleDeleteExam" [draggable]="false" [modal]="true"
           [style]="{ width: '25rem' }">
   <ng-template #header>
@@ -256,5 +255,10 @@
       <p-button label="Guardar" type="submit"/>
     </div>
   </form>
-
 </p-dialog>
+
+<ai-exam-table [dialogVisible]="visibleAIExam"
+               [chapterIds]="selectedExam.chapterIds"
+               (dialogClose)="handleDialogClose()"
+               [examId]="examIDForAIExam"/>
+
