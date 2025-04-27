@@ -7,21 +7,14 @@ import {updatePreset} from '@primeng/themes';
 import {colorPalette} from '../../app.config';
 import {Student} from '../../models/student';
 import {Subject} from '../../models/subject';
-import {Router} from '@angular/router';
 import {SubjectService} from '../../services/subject.service';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
-import {FloatLabel} from 'primeng/floatlabel';
 import {FormsModule, NgForm, ReactiveFormsModule} from '@angular/forms';
-import {IconField} from 'primeng/iconfield';
-import {InputIcon} from 'primeng/inputicon';
 import {InputText} from 'primeng/inputtext';
-import {Password} from 'primeng/password';
 import {InputGroup} from 'primeng/inputgroup';
 import {InputGroupAddon} from 'primeng/inputgroupaddon';
-import {Menu} from 'primeng/menu';
-import {MenuItem, PrimeTemplate} from 'primeng/api';
-import {ScrollPanel} from 'primeng/scrollpanel';
+import {PrimeTemplate} from 'primeng/api';
 import {Popover} from 'primeng/popover';
 import {take} from 'rxjs';
 import {Ripple} from "primeng/ripple";
@@ -34,6 +27,8 @@ import {ExamService} from '../../services/exam.service';
 import {Exam} from '../../models/exam';
 import {ChapterService} from '../../services/chapter.service';
 import {Chapter} from '../../models/chapter';
+import {Skeleton} from 'primeng/skeleton';
+import {ProgressSpinner} from 'primeng/progressspinner';
 
 @Component({
   selector: 'home',
@@ -54,7 +49,8 @@ import {Chapter} from '../../models/chapter';
     Ripple,
     TableModule,
     Tag,
-    DatePipe
+    DatePipe,
+    ProgressSpinner
   ],
   templateUrl: './home.component.html'
 })
@@ -71,6 +67,12 @@ export class HomeComponent implements OnInit {
   colorList: string[] = [];
   chosenColor: string = 'gray';
   priorities!: any[];
+  subjectAdded = false;
+
+  loadingSubjects: boolean = true;
+  loadingChapters: boolean = true;
+  loadingTasks: boolean = true;
+  loadingExams: boolean = true;
 
   constructor(
     private subjectService: SubjectService,
@@ -87,26 +89,28 @@ export class HomeComponent implements OnInit {
     });
 
     this.currentStudent = JSON.parse(localStorage.getItem('currentUser')!);
-    this.subjectService.getSubjectList(this.currentStudent.id!).subscribe((subjects: Subject[]) => {
-      this.currentSubjects = subjects;
-    });
+
+    this.loadSubjects();
 
     this.chapterService.getChaptersByStudentId(this.currentStudent.id!).subscribe((chapters: Chapter[]) => {
       this.currentChapters = chapters;
+      this.loadingChapters = false;
     })
 
     this.taskService.getTasksByStudentId(this.currentStudent.id!).subscribe((tasks: Task[]) => {
       this.currentTasks = tasks.filter((task: Task) => !task.completed);
+      this.loadingTasks = false;
     });
 
     this.examService.getExamsByStudentId(this.currentStudent.id!).subscribe((exams: Exam[]) => {
       this.currentExams = exams.filter((exam: Exam) => !exam.completed);
+      this.loadingExams = false;
     })
 
     this.priorities = [
-      { label: 'Alta', number: 1, severity: 'danger' },
-      { label: 'Media', number: 2, severity: 'warn' },
-      { label: 'Baja', number: 3, severity: 'success' },
+      {label: 'Alta', number: 1, severity: 'danger'},
+      {label: 'Media', number: 2, severity: 'warn'},
+      {label: 'Baja', number: 3, severity: 'success'},
     ];
 
     for (const color in colorPalette) {
@@ -115,6 +119,14 @@ export class HomeComponent implements OnInit {
       }
       this.colorList.push(color);
     }
+  }
+
+  loadSubjects() {
+    this.loadingSubjects = true;
+    this.subjectService.getSubjectList(this.currentStudent.id!).subscribe((subjects: Subject[]) => {
+      this.currentSubjects = subjects;
+      this.loadingSubjects = false;
+    });
   }
 
   showDialog() {
@@ -148,10 +160,8 @@ export class HomeComponent implements OnInit {
       next: () => {
         this.resetForm();
         this.visible = false;
-        window.location.reload();
-      },
-      error: (err) => {
-        console.log(err);
+        this.subjectAdded = !this.subjectAdded;
+        this.loadSubjects();
       }
     });
   }

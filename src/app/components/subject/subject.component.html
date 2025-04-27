@@ -17,7 +17,12 @@
         </div>
       </ng-template>
       <ng-template #content>
-        @if (currentChapters.length == 0) {
+        @if (loadingChapters) {
+          <div class="flex flex-column text-center">
+            <p-progress-spinner class="my-8" strokeWidth="8" fill="transparent" animationDuration=".5s"
+                                [style]="{ width: '50px', height: '50px' }"/>
+          </div>
+        } @else if (currentChapters.length == 0) {
           <div class="flex flex-column text-center">
             <span class="text-5xl font-bold text-primary my-3">Vaya...</span>
             <span class="text-xl mb-1">Parece que aun no tienes ningún tema aun</span>
@@ -107,7 +112,12 @@
         </div>
       </ng-template>
       <ng-template #content>
-        @if (currentTasks.length == 0) {
+        @if (loadingTasks) {
+          <div class="flex flex-column text-center">
+            <p-progress-spinner class="my-8" strokeWidth="8" fill="transparent" animationDuration=".5s"
+                                [style]="{ width: '50px', height: '50px' }"/>
+          </div>
+        } @else if (currentTasks.length == 0) {
           <div class="flex flex-column text-center">
             <span class="text-5xl font-bold text-primary my-3">¡Genial!</span>
             <span class="text-xl mb-1">Llevas esta asignatura al día</span>
@@ -161,45 +171,91 @@
         </div>
       </ng-template>
       <ng-template #content>
-        @if (currentExams.length == 0) {
+        @if (loadingExams) {
           <div class="flex flex-column text-center">
-            <span class="text-5xl font-bold text-primary my-3">¡Estás de suerte!</span>
-            <span class="text-xl mb-1">Parece que no tienes ningún examen pronto</span>
-            <span class="text-base font-italic mb-3">¡No dejes de estudiar!</span>
+            <p-progress-spinner class="my-8" strokeWidth="8" fill="transparent" animationDuration=".5s"
+                                [style]="{ width: '50px', height: '50px' }"/>
           </div>
         } @else {
           <div class="my-4 mx-5">
-            <p-table [value]="currentExams" stripedRows sortField="date" [sortOrder]="1" [scrollable]="true"
-                     scrollHeight="65vh">
-              <ng-template #header>
-                <tr>
-                  <th style="width:50%">
-                    Temas
-                  </th>
-                  <th style="width:25%">
-                    Nota
-                  </th>
-                  <th style="width:25%">
-                    Fecha
-                  </th>
-                </tr>
-              </ng-template>
-              <ng-template #body let-exam>
-                <tr>
-                  <td>
-                    @for (chapter of getChaptersByExamId(exam); track $index) {
-                      <p-tag class="mx-1" [value]="'Tema ' + chapter.number"/>
-                    }
-                  </td>
-                  <td>@if (exam.grade) {
-                    {{ exam.grade }}
+            <p-tabs value="0">
+              <p-tablist>
+                <p-tab value="0" class="border-round-top">Pendientes</p-tab>
+                <p-tab value="1" class="border-round-top">Realizados</p-tab>
+              </p-tablist>
+              <p-tabpanels>
+                <p-tabpanel value="0">
+                  @if (currentExams.length == 0) {
+                  <div class="flex flex-column text-center">
+                    <span class="text-5xl font-bold text-primary my-3">¡Estás de suerte!</span>
+                    <span class="text-xl mb-1">Parece que no tienes ningún examen pronto</span>
+                    <span class="text-base font-italic mb-3">¡No dejes de estudiar!</span>
+                  </div>
                   } @else {
-                    <span>Pendiente</span>
-                  }</td>
-                  <td>{{ exam.date | date: 'dd/MM/yyyy' }}</td>
-                </tr>
-              </ng-template>
-            </p-table>
+                  <p-table [value]="currentExams" stripedRows sortField="date" [sortOrder]="1" [scrollable]="true"
+                           scrollHeight="65vh">
+                    <ng-template #header>
+                      <tr>
+                        <th style="width:50%">
+                          Temas
+                        </th>
+                        <th style="width:50%">
+                          Fecha
+                        </th>
+                      </tr>
+                    </ng-template>
+                    <ng-template #body let-exam>
+                      <tr>
+                        <td>
+                          @for (chapter of getChaptersByExamId(exam); track $index) {
+                            <p-tag class="mx-1" [value]="'Tema ' + chapter.number"/>
+                          }
+                        </td>
+                        <td>{{ exam.date | date: 'dd/MM/yyyy' }}</td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                  }
+                </p-tabpanel>
+                <p-tabpanel value="1">
+                  @if (completedExams.length == 0) {
+                    <div class="flex flex-column text-center">
+                      <span class="text-5xl font-bold text-primary my-3">Hmm...</span>
+                      <span class="text-xl mb-1">No has realizado ningún examen aun</span>
+                      <span class="text-base font-italic mb-3">¡Estás de suerte!</span>
+                    </div>
+                  } @else {
+                  <p-table [value]="completedExams" stripedRows sortField="date" [sortOrder]="1" [scrollable]="true"
+                           scrollHeight="65vh">
+                    <ng-template #header>
+                      <tr>
+                        <th style="width:50%">
+                          Temas
+                        </th>
+                        <th style="width:25%">
+                          Fecha
+                        </th>
+                        <th style="width:25%">
+                          Nota
+                        </th>
+                      </tr>
+                    </ng-template>
+                    <ng-template #body let-exam>
+                      <tr>
+                        <td>
+                          @for (chapter of getChaptersByExamId(exam); track $index) {
+                            <p-tag class="mx-1" [value]="'Tema ' + chapter.number"/>
+                          }
+                        </td>
+                        <td>{{ exam.date | date: 'dd/MM/yyyy' }}</td>
+                        <td>{{ exam.grade }}</td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                  }
+                </p-tabpanel>
+              </p-tabpanels>
+            </p-tabs>
           </div>
         }
       </ng-template>

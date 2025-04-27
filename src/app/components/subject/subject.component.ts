@@ -21,7 +21,7 @@ import {Ripple} from 'primeng/ripple';
 import {PdfFileService} from '../../services/pdf-file.service';
 import {PdfFile} from '../../models/pdf-file';
 import {TableModule} from 'primeng/table';
-import { saveAs } from 'file-saver';
+import {saveAs} from 'file-saver';
 import {TaskService} from '../../services/task.service';
 import {Task} from '../../models/task';
 import {DatePipe} from '@angular/common';
@@ -30,6 +30,8 @@ import {Checkbox} from 'primeng/checkbox';
 import {ExamService} from '../../services/exam.service';
 import {Select} from 'primeng/select';
 import {Exam} from '../../models/exam';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Tab, TabList, TabPanel, TabPanels, Tabs} from 'primeng/tabs';
 
 @Component({
   selector: 'subject',
@@ -50,6 +52,12 @@ import {Exam} from '../../models/exam';
     DatePipe,
     Tag,
     Checkbox,
+    ProgressSpinner,
+    Tabs,
+    TabList,
+    Tab,
+    TabPanels,
+    TabPanel,
   ],
   templateUrl: './subject.component.html'
 })
@@ -60,6 +68,7 @@ export class SubjectComponent implements OnInit {
   currentStudent!: Student;
   currentFiles: PdfFile[] = [];
   currentExams: Exam[] = [];
+  completedExams: Exam[] = [];
   newChapter: Chapter = new Chapter();
   fileToUpload!: File;
   fileToDelete: PdfFile = new PdfFile();
@@ -73,6 +82,10 @@ export class SubjectComponent implements OnInit {
   visibleDeleteChapter: boolean = false;
   visibleDeleteSubject: boolean = false;
 
+  loadingChapters: boolean = true;
+  loadingTasks: boolean = true;
+  loadingExams: boolean = true;
+
   constructor(
     private subjectService: SubjectService,
     private chapterService: ChapterService,
@@ -84,36 +97,52 @@ export class SubjectComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const subjectId = this.route.snapshot.params['id'];
+    const subjectId: string = this.route.snapshot.params['id'];
     this.currentStudent = JSON.parse(localStorage.getItem('currentUser')!);
 
     this.subjectService.getSubject(subjectId).subscribe((subject: Subject) => {
       this.currentSubject = subject;
-      this.setPrimaryColor(this.currentSubject.color)
+      this.setPrimaryColor(this.currentSubject.color);
+      this.loadChapters();
+      this.loadPdfFiles();
+      this.loadTasks();
+      this.loadExams();
     });
-
-    this.chapterService.getCurrentChapters(subjectId).subscribe((chapters: Chapter[]) => {
-      this.currentChapters = chapters;
-      this.currentChapters.sort((a, b) => a.number - b.number);
-    });
-
-    this.pdfFileService.getFilesBySubjectId(subjectId).subscribe((files: PdfFile[] ) => {
-      this.currentFiles = files;
-    });
-
-    this.taskService.getTasksBySubjectId(subjectId).subscribe((tasks: Task[]) => {
-      this.currentTasks = tasks.filter((task: Task) => !task.completed);
-    });
-
-    this.examService.getExamsBySubjectId(subjectId).subscribe((exams: Exam[]) => {
-      this.currentExams = exams.filter((exam: Exam) => !exam.completed);
-    })
 
     this.priorities = [
-      { label: 'Alta', number: 1, severity: 'danger' },
-      { label: 'Media', number: 2, severity: 'warn' },
-      { label: 'Baja', number: 3, severity: 'success' },
+      {label: 'Alta', number: 1, severity: 'danger'},
+      {label: 'Media', number: 2, severity: 'warn'},
+      {label: 'Baja', number: 3, severity: 'success'},
     ];
+  }
+
+  loadChapters() {
+    this.chapterService.getCurrentChapters(this.currentSubject.id!).subscribe((chapters: Chapter[]) => {
+      this.currentChapters = chapters;
+      this.currentChapters.sort((a, b) => a.number - b.number);
+      this.loadingChapters = false;
+    });
+  }
+
+  loadPdfFiles() {
+    this.pdfFileService.getFilesBySubjectId(this.currentSubject.id!).subscribe((files: PdfFile[]) => {
+      this.currentFiles = files;
+    });
+  }
+
+  loadTasks() {
+    this.taskService.getTasksBySubjectId(this.currentSubject.id!).subscribe((tasks: Task[]) => {
+      this.currentTasks = tasks.filter((task: Task) => !task.completed);
+      this.loadingTasks = false;
+    });
+  }
+
+  loadExams() {
+    this.examService.getExamsBySubjectId(this.currentSubject.id!).subscribe((exams: Exam[]) => {
+      this.currentExams = exams.filter((exam: Exam) => !exam.completed);
+      this.completedExams = exams.filter((exam: Exam) => exam.completed);
+      this.loadingExams = false;
+    })
   }
 
   setPrimaryColor(color: string) {
@@ -144,7 +173,7 @@ export class SubjectComponent implements OnInit {
       next: () => {
         this.resetForm();
         this.visibleNewChapter = false;
-        window.location.reload();
+        this.loadChapters()
       },
       error: () => {
         this.isInvalid = true;
@@ -201,7 +230,7 @@ export class SubjectComponent implements OnInit {
       formData.append('file', this.fileToUpload);
       this.pdfFileService.saveFile(chapterId, this.currentSubject.id!, this.currentStudent.id!, formData).pipe(take(1)).subscribe({
         next: () => {
-          window.location.reload();
+          this.loadPdfFiles();
         }
       });
     }
@@ -230,7 +259,9 @@ export class SubjectComponent implements OnInit {
   deleteFile() {
     this.pdfFileService.deleteFileById(this.fileToDelete.id).pipe(take(1)).subscribe({
       next: () => {
-        window.location.reload();
+        this.loadPdfFiles();
+        this.visibleDeleteDocument = false;
+        this.fileToDelete = new PdfFile();
       },
       error: (err) => {
         console.log(err);
@@ -239,29 +270,25 @@ export class SubjectComponent implements OnInit {
   }
 
   deleteChapter() {
-    this.pdfFileService.deleteFileByChapterId(this.chapterToDelete.id!).pipe(
-      switchMap(() => this.examService.deleteByChapterId(this.chapterToDelete.id!)),
-      switchMap(() => this.chapterService.deleteById(this.chapterToDelete.id!)),
-      tap(() => window.location.reload())
-    ).subscribe({
-      error: err => console.error(err)
+    this.chapterService.deleteById(this.chapterToDelete.id!).pipe(take(1)).subscribe({
+      next: () => {
+        this.visibleDeleteChapter = false;
+        this.chapterToDelete = new Chapter();
+        this.loadChapters();
+      }
     });
   }
 
   deleteSubject() {
-    this.pdfFileService.deleteFileBySubjectId(this.currentSubject.id!).pipe(
-      switchMap(() => this.examService.deleteBySubjectId(this.currentSubject.id!)),
-      switchMap(() => this.chapterService.deleteAllBySubjectId(this.currentSubject.id!)),
-      switchMap(() => this.taskService.deleteBySubjectId(this.currentSubject.id!)),
-      switchMap(() => this.subjectService.deleteById(this.currentSubject.id!)),
-      tap(() => this.router.navigate(['/home']))
-    ).subscribe({
-      error: err => console.error(err)
+    this.subjectService.deleteById(this.currentSubject.id!).pipe(take(1)).subscribe({
+      next: () => {
+        void this.router.navigate(['/home']);
+      }
     });
   }
 
   updateTaskCompletion(task: any) {
-    this.taskService.addTask(task).pipe(take(1)).subscribe({});
+    this.taskService.addTask(task).pipe(take(1)).subscribe();
   }
 
   getLabelByNumber(number: number): string {

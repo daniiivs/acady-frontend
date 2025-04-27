@@ -27,8 +27,4 @@ export class ChapterService {
   deleteById(id: string): Observable<void> {
     return this.http.delete<void>(`${this.url}/delete/${id}`, { withCredentials: true });
   }
-
-  deleteAllBySubjectId(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.url}/delete/subject/${id}`, { withCredentials: true });
-  }
 }

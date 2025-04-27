@@ -20,6 +20,7 @@ import {Tag} from 'primeng/tag';
 import {TableModule} from 'primeng/table';
 import {DatePipe} from '@angular/common';
 import {Checkbox} from 'primeng/checkbox';
+import {ProgressSpinner} from 'primeng/progressspinner';
 
 @Component({
   selector: 'task-panel',
@@ -37,7 +38,8 @@ import {Checkbox} from 'primeng/checkbox';
     Tag,
     TableModule,
     DatePipe,
-    Checkbox
+    Checkbox,
+    ProgressSpinner
   ],
   templateUrl: './task-panel.component.html'
 })
@@ -51,6 +53,7 @@ export class TaskPanelComponent implements OnInit {
   priorities!: any[];
   visibleNewTask: boolean = false;
   visibleDeleteTask: boolean = false;
+  loading: boolean = true;
 
   constructor(
     private subjectService: SubjectService,
@@ -69,15 +72,20 @@ export class TaskPanelComponent implements OnInit {
       this.currentSubjects = subjects;
     });
 
-    this.taskService.getTasksByStudentId(this.currentStudent.id!).subscribe((tasks: Task[]) => {
-      this.currentTasks = tasks;
-    });
+    this.loadTasks();
 
     this.priorities = [
       { label: 'Alta', number: 1, severity: 'danger' },
       { label: 'Media', number: 2, severity: 'warn' },
       { label: 'Baja', number: 3, severity: 'success' },
     ];
+  }
+
+  loadTasks() {
+    this.taskService.getTasksByStudentId(this.currentStudent.id!).subscribe((tasks: Task[]) => {
+      this.currentTasks = tasks;
+      this.loading = false;
+    });
   }
 
   showNewTaskDialog() {
@@ -102,7 +110,9 @@ export class TaskPanelComponent implements OnInit {
   deleteTask() {
     this.taskService.deleteById(this.taskToDelete.id!).pipe(take(1)).subscribe({
       next: () => {
-        window.location.reload();
+        this.loadTasks();
+        this.visibleDeleteTask = false;
+        this.taskToDelete = new Task();
       },
       error: (err) => {
         console.log(err);
@@ -118,7 +128,7 @@ export class TaskPanelComponent implements OnInit {
       next: () => {
         this.resetForm();
         this.visibleNewTask = false;
-        window.location.reload();
+        this.loadTasks();
       },
       error: (err) => {
         console.log(err);

@@ -15,7 +15,12 @@
         </div>
       </ng-template>
       <ng-template #content>
-        @if (currentSubjects.length == 0) {
+        @if (loading) {
+          <div class="flex flex-column text-center">
+            <p-progress-spinner class="my-8" strokeWidth="8" fill="transparent" animationDuration=".5s"
+                                [style]="{ width: '50px', height: '50px' }"/>
+          </div>
+        } @else if (currentSubjects.length == 0) {
           <div class="flex flex-column text-center">
             <span class="text-5xl font-bold text-primary my-3">¡Aun no tienes asignaturas!</span>
             <span class="text-xl mb-1">Debes tener al menos una asignatura para crear un examen</span>
@@ -36,7 +41,8 @@
         } @else () {
           <div class="my-4 mx-5">
             <p-table [value]="currentExams" stripedRows sortField="date" [sortOrder]="1" [scrollable]="true"
-                     scrollHeight="65vh" selectionMode="single" [(selection)]="selectedExam" (onRowSelect)="onRowSelect($event)" dataKey="id">
+                     scrollHeight="65vh" selectionMode="single" [(selection)]="selectedExam"
+                     (onRowSelect)="onRowSelect($event)" dataKey="id">
               <ng-template #header>
                 <tr>
                   <th style="width:10%">
@@ -108,11 +114,7 @@
                       <p-tag class="mx-1" [value]="'Tema ' + chapter.number"/>
                     }
                   </td>
-                  <td>@if (exam.grade) {
-                    {{ exam.grade }}
-                  } @else {
-                    <span>Pendiente</span>
-                  }</td>
+                  <td> {{ exam.grade != undefined ? exam.grade : 'Pendiente' }}</td>
                   <td>{{ exam.date | date: 'dd/MM/yyyy' }}</td>
                   <td>
                     <p-checkbox [(ngModel)]="exam.completed" name="completed" [binary]="true"
@@ -183,7 +185,8 @@
       </p-select>
 
       <p-multi-select [options]="filterChapterByChosenSubject()" [(ngModel)]="newExam.chapterIds" appendTo="body"
-                      filter="false" showToggleAll="false" [maxSelectedLabels]="8" [selectedItemsLabel]="'{0} temas seleccionados'"
+                      filter="false" showToggleAll="false" [maxSelectedLabels]="8"
+                      [selectedItemsLabel]="'{0} temas seleccionados'"
                       [emptyMessage]="newExam.subjectId? 'No existen temas en esta asignatura' : 'Selecciona una asignatura'"
                       optionValue="id" optionLabel="number" variant="filled" placeholder="Temas" fluid id="chapters"
                       name="chapters" (onChange)="sortSelectedChapters()">
@@ -240,7 +243,7 @@
     </div>
   </div>
   <form (ngSubmit)="onSubmitCompletedExam()">
-    <div class="flex flex-column my-4 mx-8">
+    <div class="flex flex-column mt-4 mb-2 mx-2">
       <input pInputText
              [(ngModel)]="completedExam.grade"
              id="grade"
@@ -250,7 +253,16 @@
              placeholder="Nota"
              variant="filled">
     </div>
-    <div class="flex justify-content-end flex-wrap mt-3">
+
+    @if (isInvalid) {
+      <div class="flex justify-content-end">
+        <small class="text-red-600">
+          * {{ this.errorMessage }}
+        </small>
+      </div>
+    }
+
+    <div class="flex justify-content-end flex-wrap mt-5">
       <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary" (click)="resetCompletedExam()"/>
       <p-button label="Guardar" type="submit"/>
     </div>
@@ -261,4 +273,3 @@
                [chapterIds]="selectedExam.chapterIds"
                (dialogClose)="handleDialogClose()"
                [examId]="examIDForAIExam"/>
-

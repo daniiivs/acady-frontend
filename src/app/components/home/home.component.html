@@ -1,5 +1,5 @@
 <div class="flex flex-column h-screen">
-  <navbar class="z-5"/>
+  <navbar class="z-5" [subjectAdded]="subjectAdded"/>
   <div class="flex flex-grow-1 flex-column py-4 px-8 gap-4 overflow-auto">
     <p-card class="flex-shrink-0">
       <ng-template #title>
@@ -14,7 +14,12 @@
         </div>
       </ng-template>
       <ng-template #content>
-        @if (currentSubjects.length == 0) {
+        @if (loadingSubjects) {
+          <div class="flex flex-column text-center">
+            <p-progress-spinner class="my-8" strokeWidth="8" fill="transparent" animationDuration=".5s"
+                                [style]="{ width: '50px', height: '50px' }"/>
+          </div>
+        } @else if (currentSubjects.length == 0) {
           <div class="flex flex-column text-center">
             <span class="text-5xl font-bold text-primary">¡Comencemos!</span>
             <span class="text-xl mb-1">Aun no tienes ninguna asignatura</span>
@@ -27,62 +32,73 @@
     </p-card>
 
     @if (currentSubjects.length !== 0) {
-    <p-card class="w-full flex flex-column">
-      <ng-template #title>
-        <span class="text-2xl font-bold">Tareas pendientes</span>
-      </ng-template>
-      <ng-template #content>
-        @if (currentTasks.length == 0) {
+      <p-card class="w-full flex flex-column">
+        <ng-template #title>
+          <span class="text-2xl font-bold">Tareas pendientes</span>
+        </ng-template>
+        <ng-template #content>
+          @if (loadingTasks) {
+            <div class="flex flex-column text-center">
+              <p-progress-spinner class="my-8" strokeWidth="8" fill="transparent" animationDuration=".5s"
+                                  [style]="{ width: '50px', height: '50px' }"/>
+            </div>
+          } @else if (currentTasks.length == 0) {
+            <div class="flex flex-column text-center">
+              <span class="text-5xl font-bold text-primary my-3">¡Muy bien!</span>
+              <span class="text-xl mb-1">No tienes tareas pendientes</span>
+              <span class="text-base font-italic mb-3">¡No pierdas el ritmo!</span>
+            </div>
+          } @else {
+            <div class="my-4 mx-5">
+              <p-table [value]="currentTasks" stripedRows sortField="duedate" [sortOrder]="1" [scrollable]="true"
+                       scrollHeight="65vh">
+                <ng-template #header>
+                  <tr>
+                    <th style="width:40%">
+                      Tarea
+                    </th>
+                    <th style="width:20%">
+                      Asignatura
+                    </th>
+                    <th style="width:20%">
+                      Prioridad
+                    </th>
+                    <th style="width:20%">
+                      Fecha de entrega
+                    </th>
+                  </tr>
+                </ng-template>
+                <ng-template #body let-task>
+                  <tr>
+                    <td>{{ task.description }}</td>
+                    <td>
+                      <div class="flex align-items-center flex-wrap gap-2">
+                        <i class="pi pi-circle-fill"
+                           [style.color]="colorPalette[getColorById(task.subjectId)][500]"></i>
+                        <span class="pl-2">{{ getNameById(task.subjectId) }}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <p-tag [severity]="getSeverityByNumber(task.priority)" [value]="getLabelByNumber(task.priority)"/>
+                    </td>
+                    <td>{{ task.duedate | date: 'dd/MM/yyyy' }}</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          }
+        </ng-template>
+      </p-card>
+      <p-card class="w-full flex flex-column">
+        <ng-template #title>
+          <span class="text-2xl font-bold">Exámenes</span>
+        </ng-template>
+        @if (loadingExams) {
           <div class="flex flex-column text-center">
-            <span class="text-5xl font-bold text-primary my-3">¡Muy bien!</span>
-            <span class="text-xl mb-1">No tienes tareas pendientes</span>
-            <span class="text-base font-italic mb-3">¡No pierdas el ritmo!</span>
+            <p-progress-spinner class="my-8" strokeWidth="8" fill="transparent" animationDuration=".5s"
+                                [style]="{ width: '50px', height: '50px' }"/>
           </div>
-        } @else {
-          <div class="my-4 mx-5">
-            <p-table [value]="currentTasks" stripedRows sortField="duedate" [sortOrder]="1" [scrollable]="true"
-                     scrollHeight="65vh">
-              <ng-template #header>
-                <tr>
-                  <th style="width:40%">
-                    Tarea
-                  </th>
-                  <th style="width:20%">
-                    Asignatura
-                  </th>
-                  <th style="width:20%">
-                    Prioridad
-                  </th>
-                  <th style="width:20%">
-                    Fecha de entrega
-                  </th>
-                </tr>
-              </ng-template>
-              <ng-template #body let-task>
-                <tr>
-                  <td>{{ task.description }}</td>
-                  <td>
-                    <div class="flex align-items-center flex-wrap gap-2">
-                      <i class="pi pi-circle-fill" [style.color]="colorPalette[getColorById(task.subjectId)][500]"></i>
-                      <span class="pl-2">{{ getNameById(task.subjectId) }}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <p-tag [severity]="getSeverityByNumber(task.priority)" [value]="getLabelByNumber(task.priority)"/>
-                  </td>
-                  <td>{{ task.duedate | date: 'dd/MM/yyyy' }}</td>
-                </tr>
-              </ng-template>
-            </p-table>
-          </div>
-        }
-      </ng-template>
-    </p-card>
-    <p-card class="w-full flex flex-column">
-      <ng-template #title>
-        <span class="text-2xl font-bold">Exámenes</span>
-      </ng-template>
-        @if (currentExams.length == 0) {
+        } @else if (currentExams.length == 0) {
           <div class="flex flex-column text-center">
             <span class="text-5xl font-bold text-primary my-3">¡Estás de suerte!</span>
             <span class="text-xl mb-1">Parece que no tienes ningún examen pronto</span>
@@ -121,7 +137,7 @@
                       <p-tag class="mx-1" [value]="'Tema ' + chapter.number"/>
                     }
                   </td>
-                  <td>@if (exam.grade) {
+                  <td>@if (exam.grade != undefined) {
                     {{ exam.grade }}
                   } @else {
                     <span>Pendiente</span>
@@ -132,7 +148,7 @@
             </p-table>
           </div>
         }
-    </p-card>
+      </p-card>
     }
   </div>
   <div>

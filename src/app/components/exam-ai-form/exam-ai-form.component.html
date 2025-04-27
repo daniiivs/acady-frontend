@@ -1,0 +1,65 @@
+<div class="flex flex-column h-screen">
+  <navbar class="z-5"/>
+  <div class="flex flex-grow-1 align-items-center flex-column py-4 px-8 gap-4 overflow-auto">
+    <p-card class="flex-shrink-0 w-6">
+      <ng-template #title>
+        <div class="flex align-items-center justify-content-between">
+          <span class="text-2xl font-bold">Examen de {{ currentSubject.name }}</span>
+        </div>
+      </ng-template>
+      <ng-template #subtitle>
+        <div class="flex flex-column gap-1">
+          @for (chapter of currentChapters; track chapter.number) {
+            <span>Tema {{ chapter.number }}: {{ chapter.name }}</span>
+          }
+        </div>
+      </ng-template>
+      <ng-template #content>
+        <form (ngSubmit)="onSubmit(form)" #form="ngForm">
+          <div class="flex flex-column gap-6 my-5 mx-6">
+            @for (question of currentAIExam.questions; track $index) {
+              <div class="flex flex-column gap-3">
+                <div>
+                  <span class="mb-2 text-xl">{{ question.number }}. {{ question.question }}</span>
+                  @if (this.currentAIExam.grade > -1) {
+                    @if (question.correctAnswer == question.chosenAnswer) {
+                      <i class="pl-2 pi pi-check" style="color: green"></i>
+                    } @else {
+                      <i class="pl-2 pi pi-times" style="color: crimson"></i>
+                    }
+                  }
+                </div>
+                @for (answer of question.answers; track $index) {
+                  <div class="flex border-round p-2" [style]="this.currentAIExam.grade > -1 && answer.letter == question.correctAnswer.toString() ? { background: '#DEF9D4' } : ( this.currentAIExam.grade > -1 && answer.letter == question.chosenAnswer.toString() && question.chosenAnswer != question.correctAnswer ? { background: '#F8D3D3' } : '' )">
+                    <p-radio-button [disabled]="isCompleted()" [name]="question.number + answer.letter"
+                                    [value]="answer.letter"
+                                    [(ngModel)]="question.chosenAnswer" [inputId]="question.number + answer.letter"/>
+                    <label [for]="question.number + answer.letter"
+                           class="ml-2 text-md pl-1">{{ answer.answerText }}</label>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          <div class="flex justify-content-end flex-wrap gap-2">
+            <p-button type="submit" (onClick)="goBack()" label="Volver"
+                      [variant]="this.currentAIExam.grade == -1 ? 'outlined' : undefined"></p-button>
+            @if (this.currentAIExam.grade == -1) {
+              <p-button type="submit" (onClick)="onSubmit(form)" label="Entregar"></p-button>
+            }
+          </div>
+        </form>
+      </ng-template>
+    </p-card>
+  </div>
+  <div>
+    <p-toolbar>
+      <ng-template #start>
+        <span class="pl-2 text-primary font-bold">Acady</span>
+      </ng-template>
+      <ng-template #end>
+        <span class="pl-2 text-primary font-bold">2025</span>
+      </ng-template>
+    </p-toolbar>
+  </div>
+</div>

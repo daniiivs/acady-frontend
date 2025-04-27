@@ -28,18 +28,6 @@ export class PdfFileService {
     return this.http.delete<void>(`${this.url}/delete/${id}`, { withCredentials: true });
   }
 
-  deleteFileByChapterId(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.url}/delete/chapter/${id}`, { withCredentials: true });
-  }
-
-  deleteFileBySubjectId(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.url}/delete/subject/${id}`, { withCredentials: true });
-  }
-
-  deleteFileByStudentId(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.url}/delete/student/${id}`, { withCredentials: true });
-  }
-
   downloadFile(id: string): Observable<Blob> {
     return this.http.get(`${this.url}/download/${id}`, {
       responseType: 'blob',

@@ -1,5 +1,5 @@
 <p-dialog
-  header="Header"
+  header="Exámenes de IA"
   [draggable]="false"
   [resizable]="false"
   [modal]="true"
@@ -11,7 +11,12 @@
   (onShow)="updateFilteredExams()"
   (onHide)="closeDialog()"
 >
-  @if (filteredExams.length == 0 && !loading) {
+  @if (loadingExams) {
+    <div class="flex flex-column text-center">
+      <p-progress-spinner class="my-8" strokeWidth="8" fill="transparent" animationDuration=".5s"
+                          [style]="{ width: '50px', height: '50px' }"/>
+    </div>
+  } @else if (filteredExams.length == 0 && !loading) {
     <div class="flex flex-column align-items-center">
       <span class="text-5xl font-bold text-primary my-3">Vaya...</span>
       <span class="text-xl mb-1">Aun no tienes exámenes generados por IA en este tema</span>
@@ -23,16 +28,16 @@
         <tr>
           <th>Examen</th>
           <th>Nota</th>
-          <th>Ver</th>
+          <th>Acción</th>
           <th>Eliminar</th>
         </tr>
       </ng-template>
-      <ng-template #body let-exam>
+      <ng-template #body let-exam let-i="rowIndex">
         <tr>
-          <td>Examen</td>
-          <td>Nota</td>
-          <td>Ver</td>
-          <td>Eliminar</td>
+          <td>Examen {{ i + 1 }}</td>
+          <td>{{ exam.grade != -1 ? exam.grade : 'Pendiente' }}</td>
+          <td><p-button [label]="exam.grade == -1 ? 'Realizar': 'Ver'" [icon]="exam.grade == -1 ? 'pi pi-pencil' : 'pi pi-eye'" variant="text" (onClick)="handleClickViewExam(exam.id)"/></td>
+          <td><p-button icon="pi pi-times-circle" severity="danger" variant="text" (onClick)="showDeteleAIExamDialog(exam)"/></td>
         </tr>
       </ng-template>
       <ng-template #loadingbody>
@@ -47,4 +52,24 @@
     <ng-template #footer>
       <p-button class="mt-4" label="Generar examen" (onClick)="generateAIExam()" [disabled]="loading"/>
     </ng-template>
+</p-dialog>
+
+<p-dialog closable="false" [(visible)]="visibleDeleteExamDialog" [draggable]="false" [modal]="true"
+          [style]="{ width: '25rem' }">
+  <ng-template #header>
+    <div class="inline-flex items-center justify-center gap-2">
+      <span class="font-bold whitespace-nowrap text-xl">Eliminar examen</span>
+    </div>
+  </ng-template>
+  <div class="flex justify-content-center flex-wrap">
+    <i class="pi pi-exclamation-circle" style="font-size: 80px" [style.color]="colorPalette['red'][600]"></i>
+    <div class="text-center px-2 mt-4">
+      <span>¿Seguro que quieres eliminar el examen seleccionado?</span>
+    </div>
+  </div>
+  <div class="flex justify-content-end flex-wrap mt-5">
+    <p-button class="mr-1" label="Cancelar" [text]="true" severity="secondary"
+              (onClick)="resetExamToDelete()"/>
+    <p-button label="Eliminar" severity="danger" (onClick)="deleteExam()"/>
+  </div>
 </p-dialog>

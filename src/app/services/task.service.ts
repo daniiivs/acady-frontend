@@ -26,12 +26,4 @@ export class TaskService {
   deleteById(id: string): Observable<void> {
     return this.http.delete<void>(`${this.url}/delete/${id}`, {withCredentials: true});
   }
-
-  deleteBySubjectId(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.url}/delete/subject/${id}`, {withCredentials: true});
-  }
-
-  deleteByStudentId(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.url}/delete/student/${id}`, {withCredentials: true});
-  }
 }

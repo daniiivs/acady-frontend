@@ -25,6 +25,7 @@ import {ChapterService} from '../../services/chapter.service';
 import {take} from 'rxjs';
 import {MultiSelect} from 'primeng/multiselect';
 import {AiExamTableComponent} from '../ai-exam-table/ai-exam-table.component';
+import {ProgressSpinner} from 'primeng/progressspinner';
 
 @Component({
   selector: 'exam-panel',
@@ -44,7 +45,8 @@ import {AiExamTableComponent} from '../ai-exam-table/ai-exam-table.component';
     Tag,
     Toolbar,
     MultiSelect,
-    AiExamTableComponent
+    AiExamTableComponent,
+    ProgressSpinner
   ],
   templateUrl: './exam-panel.component.html'
 })
@@ -58,11 +60,15 @@ export class ExamPanelComponent implements OnInit {
   completedExam: Exam = new Exam();
   selectedExam: Exam = new Exam();
   examIDForAIExam!: string;
+  isInvalid: boolean = false;
+  errorMessage: string = '';
 
   visibleNewExam: boolean = false;
   visibleDeleteExam: boolean = false;
   visibleCompletedExam: boolean = false;
   visibleAIExam: boolean = false;
+
+  loading: boolean = true;
 
   constructor(
     private subjectService: SubjectService,
@@ -88,8 +94,13 @@ export class ExamPanelComponent implements OnInit {
       this.currentChapters = chapters;
     });
 
+    this.loadExams();
+  }
+
+  loadExams() {
     this.examService.getExamsByStudentId(this.currentStudent.id!).subscribe((exams: Exam[]) => {
       this.currentExams = exams;
+      this.loading = false;
     });
   }
 
@@ -126,16 +137,16 @@ export class ExamPanelComponent implements OnInit {
   resetCompletedExam() {
     this.visibleCompletedExam = false;
     this.completedExam = new Exam();
-    window.location.reload();
+    this.loadExams();
+    this.isInvalid = false;
   }
 
   deleteExam() {
     this.examService.deleteById(this.examToDelete.id!).pipe(take(1)).subscribe({
       next: () => {
-        window.location.reload();
-      },
-      error: (err) => {
-        console.log(err);
+        this.loadExams();
+        this.examToDelete = new Exam();
+        this.visibleDeleteExam = false;
       }
     });
   }
@@ -148,18 +159,37 @@ export class ExamPanelComponent implements OnInit {
       next: () => {
         this.resetForm();
         this.visibleNewExam = false;
-        window.location.reload();
-      },
-      error: (err) => {
-        console.log(err);
+        this.loadExams();
       }
     });
   }
 
   onSubmitCompletedExam() {
-    this.examService.addExam(this.completedExam).pipe(take(1)).subscribe({});
-    this.completedExam = new Exam();
-    window.location.reload();
+    if (this.completedExam.grade?.toString().trim() == '') {
+      this.errorMessage = 'Introduce una nota';
+      this.isInvalid = true;
+      return;
+    }
+
+    if (this.completedExam.grade! > 10 || this.completedExam.grade! < 0) {
+      this.errorMessage = 'Introduce una nota válida';
+      this.isInvalid = true;
+      return;
+    }
+
+    this.examService.addExam(this.completedExam).pipe(take(1)).subscribe({
+      next: () => {
+        this.completedExam = new Exam();
+        this.visibleCompletedExam = false;
+        this.isInvalid = false;
+        this.errorMessage = '';
+        this.loadExams();
+      },
+      error: () => {
+        this.errorMessage = 'Introduce un número válido';
+        this.isInvalid = true;
+      }
+    });
   }
 
   getColorById(id: string): string {
@@ -171,7 +201,7 @@ export class ExamPanelComponent implements OnInit {
   }
 
   filterChapterByChosenSubject() {
-    return this.currentChapters.filter(chapter => chapter.subjectId === this.newExam.subjectId);
+    return this.currentChapters.filter(chapter => chapter.subjectId === this.newExam.subjectId).sort((a, b) => a.number - b.number);
   }
 
   sortSelectedChapters() {

@@ -44,6 +44,10 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.authService.isLoggedIn()) {
+      void this.router.navigate(['/home']);
+    }
+
     updatePreset({
       semantic: {
         primary: colorPalette['gray']

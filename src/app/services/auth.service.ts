@@ -36,6 +36,10 @@ export class AuthService {
     return this.http.post(`${this.url}/logout`, null, {withCredentials: true});
   }
 
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('currentUser');
+  }
+
   private handleRegisterError(error: HttpErrorResponse) {
     if (error.status === 409) {
       return throwError(() => new Error(error.error.error));

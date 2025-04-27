@@ -35,7 +35,7 @@ import {Dialog} from 'primeng/dialog';
   ],
   templateUrl: './register.component.html'
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   currentStep: number = 1;
 
   registeredStudent: Student;
@@ -50,6 +50,12 @@ export class RegisterComponent {
     private router: Router) {
     this.registeredStudent = new Student();
     this.registeredStudent.active = true;
+  }
+
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn()) {
+      void this.router.navigate(['/home']);
+    }
   }
 
   onSubmit(registerForm: NgForm): void {
@@ -76,7 +82,7 @@ export class RegisterComponent {
     let isDisabled: boolean = false;
 
     fieldValues.forEach(value => {
-      if (value === '') {
+      if (value.trim() === '') {
         isDisabled = true;
       }
     });

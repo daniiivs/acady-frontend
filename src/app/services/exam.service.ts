@@ -26,12 +26,4 @@ export class ExamService {
   deleteById(id: string): Observable<void> {
     return this.http.delete<void>(`${this.url}/delete/${id}`, {withCredentials: true});
   }
-
-  deleteBySubjectId(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.url}/delete/subject/${id}`, {withCredentials: true});
-  }
-
-  deleteByChapterId(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.url}/delete/chapter/${id}`, {withCredentials: true});
-  }
 }

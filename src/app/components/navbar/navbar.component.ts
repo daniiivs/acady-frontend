@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {Menubar} from 'primeng/menubar';
 import {MenuItem} from 'primeng/api';
 import {Button} from 'primeng/button';
@@ -17,14 +17,36 @@ import {TieredMenu} from 'primeng/tieredmenu';
   imports: [
     Menubar,
     Button,
-    Menu,
-    TieredMenu
+    Menu
   ],
   templateUrl: './navbar.component.html'
 })
 
-export class NavbarComponent implements OnInit {
-  barItems: MenuItem[] = [];
+export class NavbarComponent implements OnInit, OnChanges {
+  @Input() subjectAdded: boolean = false;
+
+  barItems: MenuItem[] = [
+    {
+      label: 'Inicio',
+      icon: 'pi pi-home',
+      route: '/home',
+    },
+    {
+      label: 'Asignaturas',
+      icon: 'pi pi-book'
+    },
+    {
+      label: 'Exámenes',
+      icon: 'pi pi-pencil',
+      route: '/exams',
+    },
+    {
+      label: 'Tareas',
+      icon: 'pi pi-list',
+      route: '/tasks',
+    }
+  ];
+
   menuItems: MenuItem[] = [];
 
   currentStudent!: Student;
@@ -39,17 +61,9 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentStudent = JSON.parse(localStorage.getItem('currentUser')!);
-    this.subjectService.getSubjectList(this.currentStudent.id!).subscribe((subjects: Subject[]) => {
-      this.currentSubjects = subjects;
-      this.setMenuBar();
-    });
+    this.loadSubjects();
 
     this.menuItems = [
-      {
-        label: 'Ajustes',
-        icon: 'pi pi-cog',
-        route: '/login',
-      },
       {
         label: 'Salir',
         icon: 'pi pi-sign-out',
@@ -58,7 +72,22 @@ export class NavbarComponent implements OnInit {
     ]
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    this.currentStudent = JSON.parse(localStorage.getItem('currentUser')!);
+    if (changes['subjectAdded']) {
+      this.loadSubjects();
+    }
+  }
+
+  loadSubjects(): void {
+    this.subjectService.getSubjectList(this.currentStudent.id!).subscribe((subjects: Subject[]) => {
+      this.currentSubjects = subjects;
+      this.setMenuBar();
+    });
+  }
+
   setMenuBar(): void {
+    this.subjectsMenu = [];
     for (const subject of this.currentSubjects) {
       this.subjectsMenu.push({
         label: subject.name,

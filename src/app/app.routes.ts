@@ -5,6 +5,8 @@ import {HomeComponent} from './components/home/home.component';
 import {SubjectComponent} from './components/subject/subject.component';
 import {TaskPanelComponent} from './components/task-panel/task-panel.component';
 import {ExamPanelComponent} from './components/exam-panel/exam-panel.component';
+import {ExamAiFormComponent} from './components/exam-ai-form/exam-ai-form.component';
+import {authGuard} from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -23,17 +25,26 @@ export const routes: Routes = [
   {
     path: 'home',
     component: HomeComponent,
+    canActivate: [authGuard],
   },
   {
     path: 'subject/:id',
     component: SubjectComponent,
+    canActivate: [authGuard],
   },
   {
     path: 'tasks',
-    component: TaskPanelComponent
+    component: TaskPanelComponent,
+    canActivate: [authGuard],
   },
   {
     path: 'exams',
-    component: ExamPanelComponent
+    component: ExamPanelComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'aiexam/:id',
+    component: ExamAiFormComponent,
+    canActivate: [authGuard],
   }
 ];
