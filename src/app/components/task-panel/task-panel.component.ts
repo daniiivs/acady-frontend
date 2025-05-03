@@ -113,9 +113,6 @@ export class TaskPanelComponent implements OnInit {
         this.loadTasks();
         this.visibleDeleteTask = false;
         this.taskToDelete = new Task();
-      },
-      error: (err) => {
-        console.log(err);
       }
     });
   }
@@ -129,9 +126,6 @@ export class TaskPanelComponent implements OnInit {
         this.resetForm();
         this.visibleNewTask = false;
         this.loadTasks();
-      },
-      error: (err) => {
-        console.log(err);
       }
     });
   }

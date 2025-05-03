@@ -25,7 +25,7 @@ import {ProgressSpinner} from 'primeng/progressspinner';
 export class AiExamTableComponent implements OnInit, OnChanges {
   @Input() examId!: string; // ID of the exam that will show
   @Input() dialogVisible: boolean = false; // Component's visibility
-  @Input() chapterIds: (string | undefined)[] = []; // Chapters from the examn
+  @Input() chapterIds: (string | undefined)[] = []; // Chapters from the exam
   @Output() dialogClose: EventEmitter<any> = new EventEmitter(); // To emit the closing dialog event
 
   loadingGeneration: boolean = false; // If there's an AI exam being generated
@@ -113,9 +113,6 @@ export class AiExamTableComponent implements OnInit, OnChanges {
         this.loadAIExams();
         this.examAIToDelete = new ExamAI();
         this.visibleDeleteExamDialog = false;
-      },
-      error: (err) => {
-        console.log(err);
       }
     });
   }

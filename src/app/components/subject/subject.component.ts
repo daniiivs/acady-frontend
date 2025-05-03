@@ -262,9 +262,6 @@ export class SubjectComponent implements OnInit {
         this.loadPdfFiles();
         this.visibleDeleteDocument = false;
         this.fileToDelete = new PdfFile();
-      },
-      error: (err) => {
-        console.log(err);
       }
     });
   }

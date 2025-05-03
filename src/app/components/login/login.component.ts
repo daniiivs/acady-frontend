@@ -74,8 +74,6 @@ export class LoginComponent implements OnInit {
           if (err.status === 401) {
             this.errorMessage = '* ¡Las credenciales son incorrectas!'
             this.isInvalid = true;
-          } else {
-            console.log(err);
           }
         }
       });
