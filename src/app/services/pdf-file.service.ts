@@ -9,10 +9,9 @@ import {DomSanitizer} from '@angular/platform-browser';
   providedIn: 'root'
 })
 export class PdfFileService {
-  private url: string = 'http://localhost:8080/api/files';
+  private url: string = 'http://ec2-51-20-127-223.eu-north-1.compute.amazonaws.com:8080/api/files';
 
   constructor(
-    private sanitizer: DomSanitizer,
     private http: HttpClient) {
   }
 

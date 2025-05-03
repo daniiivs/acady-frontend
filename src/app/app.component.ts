@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {ButtonModule} from 'primeng/button';
 import {PrimeNG} from 'primeng/config';
-import {LoginComponent} from './components/login/login.component';
 
 @Component({
   selector: 'app-root',

@@ -7,7 +7,7 @@ import {Subject} from '../models/subject';
   providedIn: 'root'
 })
 export class SubjectService {
-  private url: string = 'http://localhost:8080/api/subjects';
+  private url: string = 'http://ec2-51-20-127-223.eu-north-1.compute.amazonaws.com:8080/api/subjects';
 
   constructor(private http: HttpClient) { }
 

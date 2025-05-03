@@ -7,7 +7,7 @@ import {Task} from '../models/task';
   providedIn: 'root'
 })
 export class TaskService {
-  private url: string = 'http://localhost:8080/api/tasks';
+  private url: string = 'http://ec2-51-20-127-223.eu-north-1.compute.amazonaws.com:8080/api/tasks';
 
   constructor(private http: HttpClient) { }
 

@@ -7,7 +7,7 @@ import {Student} from '../models/student';
   providedIn: 'root'
 })
 export class StudentService {
-  private url: string = 'http://localhost:8080/api/students';
+  private url: string = 'http://ec2-51-20-127-223.eu-north-1.compute.amazonaws.com:8080/api/students';
 
   constructor(private http: HttpClient) {
   }

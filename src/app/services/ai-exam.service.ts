@@ -7,7 +7,7 @@ import {ExamAI} from '../models/examAI';
   providedIn: 'root'
 })
 export class AiExamService {
-  private url: string = 'http://localhost:8080/api/aiexam';
+  private url: string = 'http://ec2-51-20-127-223.eu-north-1.compute.amazonaws.com:8080/api/aiexam';
 
   constructor(private http: HttpClient) {
   }

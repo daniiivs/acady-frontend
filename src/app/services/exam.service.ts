@@ -7,7 +7,7 @@ import {Exam} from '../models/exam';
   providedIn: 'root'
 })
 export class ExamService {
-  private url: string = 'http://localhost:8080/api/exams';
+  private url: string = 'http://ec2-51-20-127-223.eu-north-1.compute.amazonaws.com:8080/api/exams';
 
   constructor(private http: HttpClient) { }
 

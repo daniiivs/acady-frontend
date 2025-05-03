@@ -7,7 +7,7 @@ import {Chapter} from '../models/chapter';
   providedIn: 'root'
 })
 export class ChapterService {
-  private url: string = 'http://localhost:8080/api/chapters';
+  private url: string = 'http://ec2-51-20-127-223.eu-north-1.compute.amazonaws.com:8080/api/chapters';
 
   constructor(private http: HttpClient) {
   }

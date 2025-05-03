@@ -7,7 +7,7 @@ import {catchError, Observable, tap, throwError} from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private url: string = 'http://localhost:8080/api/auth';
+  private url: string = 'http://ec2-51-20-127-223.eu-north-1.compute.amazonaws.com:8080/api/auth';
 
   constructor(private http: HttpClient) {
   }
@@ -21,7 +21,7 @@ export class AuthService {
   login(username: string, password: string): Observable<{ token: string }> {
     const body = new URLSearchParams();
     body.set('username', username);
-    body.set('password', password)
+    body.set('password', password);
 
     return this.http.post<{ token: string }>(`${this.url}/login`, body.toString(),
       {
