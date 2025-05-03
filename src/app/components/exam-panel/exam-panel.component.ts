@@ -165,7 +165,7 @@ export class ExamPanelComponent implements OnInit {
   }
 
   onSubmitCompletedExam() {
-    if (this.completedExam.grade?.toString().trim() == '' || this.completedExam.grade?.toString().trim() == undefined) {
+    if (this.completedExam.grade?.toString().trim() == '' || (this.completedExam.completed && this.completedExam.grade?.toString().trim() == undefined)) {
       this.errorMessage = 'Introduce una nota';
       this.isInvalid = true;
       return;
