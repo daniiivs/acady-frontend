@@ -1,7 +1,7 @@
 <div class="flex justify-content-center align-items-center" style="height: 100vh;">
   <p-card class="mb-5 px-8" [style]="{ width: '45rem' }">
     <div class="px-5">
-      <form (ngSubmit)="onSubmit(registerForm)" #registerForm="ngForm">
+      <form (ngSubmit)="onSubmit(registerForm)" (keydown.enter)="$event.preventDefault()" #registerForm="ngForm">
         <p-stepper [(value)]="currentStep" [linear]="true">
           <p-step-list>
             <p-step [value]="1"></p-step>

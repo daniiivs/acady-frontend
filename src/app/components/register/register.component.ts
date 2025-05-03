@@ -49,7 +49,6 @@ export class RegisterComponent implements OnInit {
     private authService: AuthService,
     private router: Router) {
     this.registeredStudent = new Student();
-    this.registeredStudent.active = true;
   }
 
   ngOnInit(): void {

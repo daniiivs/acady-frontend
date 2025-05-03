@@ -6,7 +6,8 @@ import {provideAnimationsAsync} from '@angular/platform-browser/animations/async
 import {providePrimeNG} from 'primeng/config';
 import Aura from '@primeng/themes/aura'
 import {definePreset} from '@primeng/themes';
-import {provideHttpClient} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import {JwtInterceptor} from './interceptor/jwt.interceptor';
 
 export const colorPalette: {[key: string]: any} = {
   red: {
@@ -5390,5 +5391,9 @@ export const appConfig: ApplicationConfig = {
     }),
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
-    provideHttpClient()]
+    provideHttpClient(
+      withInterceptorsFromDi()
+    ),
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true}
+  ]
 };

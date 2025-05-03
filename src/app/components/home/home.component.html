@@ -134,7 +134,7 @@
                   </td>
                   <td>
                     @for (chapter of getChaptersByExamId(exam); track $index) {
-                      <p-tag class="mx-1" [value]="'Tema ' + chapter.number"/>
+                      <p-tag class="mx-1" [value]="'Tema ' + chapter?.number"/>
                     }
                   </td>
                   <td>@if (exam.grade != undefined) {
@@ -190,7 +190,7 @@
                variant="filled"/>
       </p-inputgroup>
       <input pInputText
-             placeholder="Código"
+             placeholder="Código (ej. Lengua: LEN)"
              [(ngModel)]="newSubject.code"
              id="code"
              name="code"

@@ -7,12 +7,12 @@ import {Student} from '../models/student';
   providedIn: 'root'
 })
 export class StudentService {
-  private url: string = 'http://localhost:8080/students';
+  private url: string = 'http://localhost:8080/api/students';
 
   constructor(private http: HttpClient) {
   }
 
   getCurrentStudent(): Observable<Student> {
-    return this.http.get<Student>(`${this.url}/current`, { withCredentials: true });
+    return this.http.get<Student>(`${this.url}/current`);
   }
 }

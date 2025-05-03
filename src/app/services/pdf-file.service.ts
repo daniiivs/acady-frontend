@@ -9,7 +9,7 @@ import {DomSanitizer} from '@angular/platform-browser';
   providedIn: 'root'
 })
 export class PdfFileService {
-  private url: string = 'http://localhost:8080/files';
+  private url: string = 'http://localhost:8080/api/files';
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -17,21 +17,20 @@ export class PdfFileService {
   }
 
   saveFile(chapterId: string, subjectId: string, studentId: string, file: FormData): Observable<Chapter[]> {
-    return this.http.post<Chapter[]>(`${this.url}/upload/${chapterId}&&${subjectId}&&${studentId}`, file, { withCredentials: true });
+    return this.http.post<Chapter[]>(`${this.url}/upload/${chapterId}&&${subjectId}&&${studentId}`, file);
   }
 
   getFilesBySubjectId(subjectId: string): Observable<PdfFile[]> {
-    return this.http.get<PdfFile[]>(`${this.url}/subject/${subjectId}`, { withCredentials: true });
+    return this.http.get<PdfFile[]>(`${this.url}/subject/${subjectId}`);
   }
 
   deleteFileById(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.url}/delete/${id}`, { withCredentials: true });
+    return this.http.delete<void>(`${this.url}/delete/${id}`);
   }
 
   downloadFile(id: string): Observable<Blob> {
     return this.http.get(`${this.url}/download/${id}`, {
-      responseType: 'blob',
-      withCredentials: true
+      responseType: 'blob'
     });
   }
 }

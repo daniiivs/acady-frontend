@@ -7,23 +7,23 @@ import {Subject} from '../models/subject';
   providedIn: 'root'
 })
 export class SubjectService {
-  private url: string = 'http://localhost:8080/subjects';
+  private url: string = 'http://localhost:8080/api/subjects';
 
   constructor(private http: HttpClient) { }
 
   getSubject(subjectId: string): Observable<Subject> {
-    return this.http.get<Subject>(`${this.url}/${subjectId}`, {withCredentials: true});
+    return this.http.get<Subject>(`${this.url}/${subjectId}`);
   }
 
   getSubjectList(studentId: string): Observable<Subject[]> {
-    return this.http.get<Subject[]>(`${this.url}/all/${studentId}`, {withCredentials: true});
+    return this.http.get<Subject[]>(`${this.url}/all/${studentId}`);
   }
 
   addSubject(subject: Subject): Observable<void> {
-    return this.http.post<void>(`${this.url}/add`, subject, {withCredentials: true});
+    return this.http.post<void>(`${this.url}/add`, subject);
   }
 
   deleteById(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.url}/delete/${id}`, {withCredentials: true});
+    return this.http.delete<void>(`${this.url}/delete/${id}`);
   }
 }

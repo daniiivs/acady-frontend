@@ -65,9 +65,14 @@ export class NavbarComponent implements OnInit, OnChanges {
 
     this.menuItems = [
       {
-        label: 'Salir',
-        icon: 'pi pi-sign-out',
-        route: '/login',
+        label: this.currentStudent.name + ' ' + this.currentStudent.lastname,
+        items: [
+          {
+            label: 'Salir',
+            icon: 'pi pi-sign-out',
+            route: '/login',
+          }
+        ]
       }
     ]
   }

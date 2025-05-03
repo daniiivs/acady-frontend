@@ -44,11 +44,11 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.authService.isLoggedIn()) {
+    if (this.authService.isLoggedIn()) { // Redirects if user is already logged in
       void this.router.navigate(['/home']);
     }
 
-    updatePreset({
+    updatePreset({ // Changes main color to gray
       semantic: {
         primary: colorPalette['gray']
       }
@@ -56,24 +56,26 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(loginForm: NgForm): void {
-    if (this.username == '' || this.password == '') {
+    if (this.username == '' || this.password == '') { // If fields are empty...
       this.errorMessage = '* ¡Rellena todos los campos!'
       this.isInvalid = true;
       return;
     }
 
     if (!loginForm.invalid) {
-      this.authService.login(this.username, this.password).pipe(take(1)).subscribe({
+      this.authService.login(this.username, this.password).pipe(take(1)).subscribe({ // Logs in
         next: () => {
           this.studentService.getCurrentStudent().pipe(take(1)).subscribe((student: Student) => {
-            localStorage.setItem('currentUser', JSON.stringify(student));
-            void this.router.navigateByUrl('/home');
+            localStorage.setItem('currentUser', JSON.stringify(student)); // Saves logged user in local storage
+            void this.router.navigateByUrl('/home'); // Redirects to home page
           });
         },
-        error: err => {
+        error: err => { // Gets and shows possible errors
           if (err.status === 401) {
             this.errorMessage = '* ¡Las credenciales son incorrectas!'
             this.isInvalid = true;
+          } else {
+            console.log(err);
           }
         }
       });

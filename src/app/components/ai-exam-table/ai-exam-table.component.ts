@@ -23,18 +23,19 @@ import {ProgressSpinner} from 'primeng/progressspinner';
   templateUrl: './ai-exam-table.component.html'
 })
 export class AiExamTableComponent implements OnInit, OnChanges {
-  @Input() examId!: string;
-  @Input() dialogVisible: boolean = false;
-  @Input() chapterIds: (string | undefined)[] = [];
-  @Output() dialogClose: EventEmitter<any> = new EventEmitter();
+  @Input() examId!: string; // ID of the exam that will show
+  @Input() dialogVisible: boolean = false; // Component's visibility
+  @Input() chapterIds: (string | undefined)[] = []; // Chapters from the examn
+  @Output() dialogClose: EventEmitter<any> = new EventEmitter(); // To emit the closing dialog event
 
-  loading: boolean = false;
-  loadingExams: boolean = true;
-  currentAiExams: ExamAI[] = [];
-  filteredExams: ExamAI[] = [];
+  loadingGeneration: boolean = false; // If there's an AI exam being generated
+  loadingExams: boolean = true; // If exams are loading
+  currentAiExams: ExamAI[] = []; // List of all AI exams of a student
+  filteredExams: ExamAI[] = []; // List of all AI exams associated to a specific exam
   currentStudent!: Student;
   examAIToDelete: ExamAI = new ExamAI();
-
+  errorVisible: boolean = false;
+  errorMessage: string = '';
   visibleDeleteExamDialog: boolean = false;
 
   constructor(
@@ -42,34 +43,42 @@ export class AiExamTableComponent implements OnInit, OnChanges {
     private router: Router) {}
 
   ngOnInit() {
-    this.currentStudent = JSON.parse(localStorage.getItem('currentUser')!);
+    this.currentStudent = JSON.parse(localStorage.getItem('currentUser')!); // Get current student
     this.loadAIExams();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['examId']) {
+    if (changes['examId']) { // Checks if the user chose another exam
       this.loadingExams = true;
     }
   }
 
+  // Updates AI exams when the user chooses a new exam
   updateFilteredExams() {
     this.filteredExams = this.currentAiExams.filter(exam => exam.examId === this.examId);
     this.loadingExams = false;
-    this.loading = false;
+    this.loadingGeneration = false;
   }
 
   closeDialog() {
     this.dialogClose.emit();
+    this.errorVisible = false;
+    this.errorMessage = '';
   }
 
+  // Generates a new AI exam
   generateAIExam() {
-    this.loading = true;
+    this.errorVisible = false;
+    this.errorMessage = '';
+    this.loadingGeneration = true;
     this.aiExamService.generateAIExam(this.examId, this.chapterIds).pipe(take(1)).subscribe({
       next: () => {
-        this.loadAIExams();
+        this.loadAIExams(); // Loads exams again
       },
-      error: (err) => {
-        this.loading = false;
+      error: (err) => { // Shows error to user
+        this.errorVisible = true;
+        this.errorMessage = err.error.error;
+        this.loadingGeneration = false;
       }
     });
   }
@@ -81,7 +90,7 @@ export class AiExamTableComponent implements OnInit, OnChanges {
         this.updateFilteredExams();
       },
       error: () => {
-        this.loading = false;
+        this.loadingGeneration = false;
       }
     });
   }

@@ -208,7 +208,7 @@
                       <tr>
                         <td>
                           @for (chapter of getChaptersByExamId(exam); track $index) {
-                            <p-tag class="mx-1" [value]="'Tema ' + chapter.number"/>
+                            <p-tag class="mx-1" [value]="'Tema ' + chapter?.number"/>
                           }
                         </td>
                         <td>{{ exam.date | date: 'dd/MM/yyyy' }}</td>

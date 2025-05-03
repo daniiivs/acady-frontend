@@ -16,14 +16,8 @@
       <p-progress-spinner class="my-8" strokeWidth="8" fill="transparent" animationDuration=".5s"
                           [style]="{ width: '50px', height: '50px' }"/>
     </div>
-  } @else if (filteredExams.length == 0 && !loading) {
-    <div class="flex flex-column align-items-center">
-      <span class="text-5xl font-bold text-primary my-3">Vaya...</span>
-      <span class="text-xl mb-1">Aun no tienes exámenes generados por IA en este tema</span>
-      <span class="text-base font-italic mb-3">Genera uno para empezar a practicar</span>
-    </div>
   } @else {
-    <p-table [loading]="loading" showLoader="false" [value]="filteredExams" [scrollable]="true" scrollHeight="flex" [tableStyle]="{ 'min-width': '50rem' }">
+    <p-table [loading]="loadingGeneration" showLoader="false" [value]="filteredExams" [scrollable]="true" scrollHeight="flex" [tableStyle]="{ 'min-width': '50rem' }">
       <ng-template #header>
         <tr>
           <th>Examen</th>
@@ -47,10 +41,20 @@
           </td>
         </tr>
       </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6">No hay exámenes que mostrar.</td>
+        </tr>
+      </ng-template>
     </p-table>
   }
     <ng-template #footer>
-      <p-button class="mt-4" label="Generar examen" (onClick)="generateAIExam()" [disabled]="loading"/>
+      <div>
+        @if (errorVisible) {
+          <span class="text-base text-red-600 font-italic">Error - {{ errorMessage }}</span>
+        }
+        <p-button class="mt-4 ml-4" label="Generar examen" (onClick)="generateAIExam()" [disabled]="loadingGeneration"/>
+      </div>
     </ng-template>
 </p-dialog>
 

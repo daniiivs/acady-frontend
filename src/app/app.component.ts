@@ -6,7 +6,7 @@ import {LoginComponent} from './components/login/login.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ButtonModule, LoginComponent],
+  imports: [RouterOutlet, ButtonModule],
   templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {

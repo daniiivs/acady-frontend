@@ -4,6 +4,5 @@ export class Student {
   email: string = '';
   password: string = '';
   name: string = '';
-  lastname: string = '';
-  active: boolean = true;
+  lastname: string = ''
 }

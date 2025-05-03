@@ -140,6 +140,11 @@
                   </td>
                 </tr>
               </ng-template>
+              <ng-template #emptymessage>
+                <tr>
+                  <td colspan="6">No hay tareas que mostrar.</td>
+                </tr>
+              </ng-template>
             </p-table>
           </div>
         }
@@ -179,6 +184,7 @@
 
       <p-date-picker [(ngModel)]="newTask.duedate"
                      [showIcon]="true"
+                     [firstDayOfWeek]="1"
                      id="date"
                      name="date"
                      #date="ngModel"
